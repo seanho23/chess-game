@@ -1,12 +1,12 @@
 package com.seanhoapps.chessgame;
 
 public class Pawn extends Piece {
-	public Pawn(PieceColor color) {
+	public Pawn(ChessColor color) {
 		super(PieceType.PAWN, color);
 	}
 	
 	@Override
-	public boolean isValidMove(Position from, Position to) {
+	public boolean isValidMove(Board board, int newRow, int newCol) {
 		return false;
 	}
 

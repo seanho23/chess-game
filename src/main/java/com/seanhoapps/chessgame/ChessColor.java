@@ -1,5 +1,5 @@
 package com.seanhoapps.chessgame;
 
-public enum PieceColor {
+public enum ChessColor {
 	WHITE, BLACK;
 }

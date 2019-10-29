@@ -1,18 +1,19 @@
 package com.seanhoapps.chessgame;
 
 public class Knight extends Piece {
-	public Knight(PieceColor color) {
+	public Knight(ChessColor color) {
 		super(PieceType.KNIGHT, color);
 	}
 	
 	@Override
-	public boolean isValidMove(Position from, Position to) {
+	public boolean isValidMove(Board board, int newRow, int newCol) {
 		return false;
 	}
-
+	
+	// King is already K
 	@Override
-	public char getSymbol() {
-		if (color == PieceColor.BLACK) {
+	public char getAbbreviation() {		
+		if (color == ChessColor.WHITE) {
 			return 'N';
 		}
 		else {

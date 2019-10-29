@@ -1,12 +1,12 @@
 package com.seanhoapps.chessgame;
 
 public class King extends Piece {
-	public King(PieceColor color) {
-		super(PieceType.KNIGHT, color);
+	public King(ChessColor color) {
+		super(PieceType.KING, color);
 	}
 	
 	@Override
-	public boolean isValidMove(Position from, Position to) {
+	public boolean isValidMove(Board board, int newRow, int newCol) {
 		return false;
 	}
 	
