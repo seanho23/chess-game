@@ -1,22 +1,32 @@
 package com.seanhoapps.chessgame;
 
 public class PieceFactory {
-	public static Piece getPiece(PieceType type, PieceColor color) {
+	public static Piece createPiece(PieceType type, ChessColor color) {
+		Piece piece = null;
+		
 		switch (type) {
 			case KING:
-				return new King(color);
+				piece = new King(color);
+				break;
 			case QUEEN:
-				return new Queen(color);
+				piece = new Queen(color);
+				break;
 			case BISHOP:
-				return new Bishop(color);
+				piece = new Bishop(color);
+				break;
 			case KNIGHT:
-				return new Knight(color);
+				piece = new Knight(color);
+				break;
 			case ROOK:
-				return new Rook(color);
+				piece = new Rook(color);
+				break;
 			case PAWN:
-				return new Pawn(color);
+				piece = new Pawn(color);
+				break;
 			default:
-				return null;
+				throw new AssertionError(type); // Should never happen
 		}
+		
+		return piece;
 	}
 }

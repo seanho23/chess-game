@@ -15,6 +15,5 @@ public class ChessGame {
 		Player player2 = new Player(player2Name);
 		
 		Game chess = new Game(player1, player2);
-//		chess.play();
 	}
 }

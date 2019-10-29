@@ -1,12 +1,12 @@
 package com.seanhoapps.chessgame;
 
 public class Rook extends Piece {
-	public Rook(PieceColor color) {
+	public Rook(ChessColor color) {
 		super(PieceType.ROOK, color);
 	}
 	
 	@Override
-	public boolean isValidMove(Position from, Position to) {
+	public boolean isValidMove(Board board, int newRow, int newCol) {
 		return false;
 	}
 }

@@ -5,71 +5,44 @@ public class Game {
 	static final int ROW_SIZE = 8;
 	static final int COL_SIZE = 8;
 	
-	private static boolean isGameOver = false;
-	Piece[][] board = new Piece[ROW_SIZE][COL_SIZE];
+	Board board;
 	
 	public Game(Player whitePlayer, Player blackPlayer) {
-		initBoard();
-		printBoard();
+		initBoard(ROW_SIZE, COL_SIZE);
+		board.printSquareColors();
+		System.out.println();
+		board.printPieces();
 	}
 	
-	public void initBoard() {
-		initPieces(PieceColor.BLACK);
-		initPieces(PieceColor.WHITE);
+	public void initBoard(int rowSize, int colSize) {
+		board = new Board(rowSize, colSize);
+		initPieces(ChessColor.WHITE);
+		initPieces(ChessColor.BLACK);
 	}
 	
-	public void initPieces(PieceColor color) {
-		int row, pawnRow;
+	public void initPieces(ChessColor color) {
+		int kingRow, pawnRow;
 		
-		if (color == PieceColor.BLACK) {
-			row = 0;
-			pawnRow = row + 1;
+		if (color == ChessColor.WHITE) {
+			kingRow = board.getRowSize() - 1;
+			pawnRow = kingRow - 1;
 		}
 		else {
-			row = getRowSize() - 1;
-			pawnRow = row - 1;
+			kingRow = 0;
+			pawnRow = kingRow + 1;
 		}
 		
-		board[row][0] = PieceFactory.getPiece(PieceType.ROOK, color);
-		board[row][1] = PieceFactory.getPiece(PieceType.KNIGHT, color);
-		board[row][2] = PieceFactory.getPiece(PieceType.BISHOP, color);
-		board[row][3] = PieceFactory.getPiece(PieceType.QUEEN, color);
-		board[row][4] = PieceFactory.getPiece(PieceType.KING, color);
-		board[row][5] = PieceFactory.getPiece(PieceType.BISHOP, color);
-		board[row][6] = PieceFactory.getPiece(PieceType.KNIGHT, color);
-		board[row][7] = PieceFactory.getPiece(PieceType.ROOK, color);
+		board.placePiece(PieceFactory.createPiece(PieceType.ROOK, color), kingRow, 0);
+		board.placePiece(PieceFactory.createPiece(PieceType.KNIGHT, color), kingRow, 1);
+		board.placePiece(PieceFactory.createPiece(PieceType.BISHOP, color), kingRow, 2);
+		board.placePiece(PieceFactory.createPiece(PieceType.QUEEN, color), kingRow, 3);
+		board.placePiece(PieceFactory.createPiece(PieceType.KING, color), kingRow, 4);
+		board.placePiece(PieceFactory.createPiece(PieceType.BISHOP, color), kingRow, 5);
+		board.placePiece(PieceFactory.createPiece(PieceType.KNIGHT, color), kingRow, 6);
+		board.placePiece(PieceFactory.createPiece(PieceType.ROOK, color), kingRow, 7);
 		
-		for (int col = 0; col < getColSize(); col++) {
-			board[pawnRow][col] = PieceFactory.getPiece(PieceType.PAWN, color);
+		for (int col = 0; col < board.getColSize(); col++) {
+			board.placePiece(PieceFactory.createPiece(PieceType.PAWN, color), pawnRow, col);
 		}
-	}
-	
-	public int getRowSize() {
-		return board.length;
-	}
-	
-	public int getColSize() {
-		return board[0].length;
-	}
-	
-	public void printBoard() {
-		for (int row = 0; row < getRowSize(); row++) {
-			for (int col = 0; col < getColSize(); col++) {
-				Piece piece = board[row][col];
-				
-				if (piece != null) {
-					System.out.print(piece.getSymbol());
-				}
-				else {
-					System.out.print(" ");
-				}
-			}
-			
-			System.out.println();
-		}
-	}
-	
-	public void play() {
-		
 	}
 }
