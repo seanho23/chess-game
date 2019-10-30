@@ -6,7 +6,7 @@ public class Rook extends Piece {
 	}
 	
 	@Override
-	public boolean isValidMove(Board board, int newRow, int newCol) {
+	public boolean getValidMoves(Position startPosition, Position endPosition) {
 		return false;
 	}
 }

@@ -1,11 +1,23 @@
 package com.seanhoapps.chessgame;
 
 public class Square {
-	ChessColor color;
-	Piece piece = null;
+	private Position position;
+	private ChessColor color;
+	private Piece piece = null;
 	
-	public Square(ChessColor color) {
+	public Square(Position position, ChessColor color, Piece piece) {
+		this.position = position;
 		this.color = color;
+		this.piece = piece;
+	}
+	
+	public Square(Position position, ChessColor color) {
+		this.position = position;
+		this.color = color;
+	}
+	
+	public Position getPosition() {
+		return position;
 	}
 		
 	public ChessColor getColor() {

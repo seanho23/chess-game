@@ -1,29 +1,39 @@
 package com.seanhoapps.chessgame;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Board {
-	Square[][] squares;
+	private int numRows, numCols;
+	private Map<Position, Square> squares;
 	
-	public Board(int rowSize, int colSize) {
-		init(rowSize, colSize);
+	public Board(int numRows, int numCols) {
+		this.numRows = numRows;
+		this.numCols = numCols;
+		init();
 	}
 	
-	public void init(int rowSize, int colSize) {
-		squares = new Square[rowSize][colSize];
+	public void init() {
+		squares = new HashMap<Position, Square>();
 		initSquares();
 	}
 	
 	public void initSquares() {		
 		boolean isWhite = true;
 		
-		for (int row = 0; row < getRowSize(); row++) {	
-			for (int col = 0; col < getColSize(); col++) {
+		for (int row = 0; row < getNumRows(); row++) {	
+			for (int col = 0; col < getNumCols(); col++) {
+				Position position = new Position(row, col);
+				Square square = null;
+				
 				if (isWhite) {
-					squares[row][col] = new Square(ChessColor.WHITE);
+					square = new Square(position, ChessColor.WHITE);
 				}
 				else {
-					squares[row][col] = new Square(ChessColor.BLACK);
+					square = new Square(position, ChessColor.BLACK);
 				}
 				
+				squares.put(position, square);
 				isWhite = !isWhite;
 			}
 			
@@ -31,56 +41,51 @@ public class Board {
 		}
 	}
 	
-	public Piece getPiece(int row, int col) {
-		return squares[row][col].getPiece();
+	public Piece getPieceAt(Position position) {
+		Square square = getSquareAt(position);
+		return square.getPiece();
 	}
 	
-	public void placePiece(Piece piece, int row, int col) {
-		piece.setRow(row);
-		piece.setCol(col);
-		squares[row][col].setPiece(piece);
+	public void placePieceAt(Position position, Piece piece) {
+		Square square = getSquareAt(position);
+		Square newSquare = new Square(position, square.getColor(), piece);
+		squares.put(position, newSquare);
 	}
 	
-	public void printPieces() {		
-		int rowSize = getRowSize();
+	public Square getSquareAt(Position position) {
+		return squares.get(position);
+	}
+	
+	public boolean hasSquareAt(Position position) {
+		return squares.containsKey(position);
+	}
+	
+	public boolean hasPieceAt(Position position) {
+		Square square = getSquareAt(position);
 		
-		for (int row = 0; row < rowSize; row++) {
-			String space = "";
-			
-			System.out.print(rowSize - row + " | ");
-			
-			for (int col = 0; col < getColSize(); col++) {
-				Piece piece = getPiece(row, col);
-				
-				if (piece != null) {
-					System.out.print(space + piece.getAbbreviation());
-				}
-				else {
-					System.out.print(space + " ");
-				}
-				
-				space = " ";
-			}
-			
-			System.out.println();
+		if (square.getPiece() == null) {
+			return false;
 		}
 		
-		System.out.println("--|----------------");
-		System.out.println("  | A B C D E F G H");
+		return true;
 	}
 	
-	public void printSquareColors() {		
-		int rowSize = getRowSize();
-		
-		for (int row = 0; row < rowSize; row++) {
+	public int getNumRows() {
+		return numRows;
+	}
+	
+	public int getNumCols() {
+		return numCols;
+	}
+	
+	public void printSquareColors() {
+		for (int row = 0; row < numRows; row++) {
 			String space = "";
 			
-			System.out.print(rowSize - row + " | ");
-			
-			for (int col = 0; col < getColSize(); col++) {
-				ChessColor color = squares[row][col].getColor();
+			for (int col = 0; col < numCols; col++) {
+				Square square = getSquareAt(new Position(row, col));
 				
-				if (color == ChessColor.WHITE) {
+				if (square.getColor() == ChessColor.WHITE) {
 					System.out.print(space + "W");
 				}
 				else {
@@ -92,26 +97,26 @@ public class Board {
 			
 			System.out.println();
 		}
-
-		System.out.println("--|----------------");
-		System.out.println("  | A B C D E F G H");
 	}
 	
-	public boolean isOccupied(int row, int col) {
-		Piece piece = getPiece(row, col);
-		
-		if (piece != null) {
-			return true;
+	public void printPieces() {		
+		for (int row = 0; row < numRows; row++) {
+			String space = "";
+			
+			for (int col = 0; col < numCols; col++) {
+				Piece piece = getPieceAt(new Position(row, col));
+				
+				if (piece != null) {
+					System.out.print(space + piece.getAbbreviation());
+				}
+				else {
+					System.out.print(" ");
+				}
+				
+				space = " ";
+			}
+			
+			System.out.println();
 		}
-		
-		return false;
-	}
-	
-	public int getRowSize() {
-		return squares.length;
-	}
-	
-	public int getColSize() {
-		return squares[0].length;
 	}
 }

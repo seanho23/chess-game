@@ -1,17 +1,15 @@
 package com.seanhoapps.chessgame;
 
 public abstract class Piece {
-	PieceType type;
-	ChessColor color;
-	int row;
-	int col;
+	protected PieceType type;
+	protected ChessColor color;
 	
 	public Piece(PieceType type, ChessColor color) {
 		this.type = type;
 		this.color = color;
 	}
 	
-	public abstract boolean isValidMove(Board board, int toRow, int toCol);
+	public abstract boolean getValidMoves(Position startPosition, Position endPosition);
 	
 	// White pieces = upper case
 	// Black pieces = lower case
@@ -29,23 +27,7 @@ public abstract class Piece {
 	public ChessColor getColor() {
 		return color;
 	}
-	
-	public int getRow() {
-		return row;
-	}
-	
-	public void setRow(int newRow) {
-		row = newRow;
-	}
-	
-	public int getCol() {
-		return col;
-	}
-	
-	public void setCol(int newCol) {
-		col = newCol;
-	}
-	
+
 	@Override
 	public String toString() {
 		return type.toString();
