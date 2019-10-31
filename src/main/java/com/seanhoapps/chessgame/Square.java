@@ -1,27 +1,23 @@
 package com.seanhoapps.chessgame;
 
 public class Square {
-	private Position position;
 	private ChessColor color;
 	private Piece piece = null;
 	
-	public Square(Position position, ChessColor color, Piece piece) {
-		this.position = position;
+	public Square(ChessColor color) {
 		this.color = color;
-		this.piece = piece;
-	}
-	
-	public Square(Position position, ChessColor color) {
-		this.position = position;
-		this.color = color;
-	}
-	
-	public Position getPosition() {
-		return position;
 	}
 		
 	public ChessColor getColor() {
 		return color;
+	}
+	
+	public boolean isWhite() {
+		if (color == ChessColor.WHITE) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public Piece getPiece() {
@@ -30,5 +26,13 @@ public class Square {
 	
 	public void setPiece(Piece piece) {
 		this.piece = piece;
+	}
+	
+	public boolean isOccupied() {
+		if (piece != null) {
+			return true;
+		}
+		
+		return false;
 	}
 }

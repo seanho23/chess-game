@@ -4,36 +4,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Board {
-	private int numRows, numCols;
-	private Map<Position, Square> squares;
+	private Square[][] squares;
 	
-	public Board(int numRows, int numCols) {
-		this.numRows = numRows;
-		this.numCols = numCols;
-		init();
+	public Board(int rowSize, int colSize) {
+		init(rowSize, colSize);
 	}
 	
-	public void init() {
-		squares = new HashMap<Position, Square>();
+	public void init(int rowSize, int colSize) {
+		squares = new Square[rowSize][colSize];
 		initSquares();
 	}
 	
 	public void initSquares() {		
 		boolean isWhite = true;
 		
-		for (int row = 0; row < getNumRows(); row++) {	
-			for (int col = 0; col < getNumCols(); col++) {
-				Position position = new Position(row, col);
+		for (int row = 0; row < getRowSize(); row++) {	
+			for (int col = 0; col < getColSize(); col++) {
 				Square square = null;
 				
 				if (isWhite) {
-					square = new Square(position, ChessColor.WHITE);
+					square = new Square(ChessColor.WHITE);
 				}
 				else {
-					square = new Square(position, ChessColor.BLACK);
+					square = new Square(ChessColor.BLACK);
 				}
 				
-				squares.put(position, square);
+				squares[row][col] = square;
 				isWhite = !isWhite;
 			}
 			
@@ -41,55 +37,41 @@ public class Board {
 		}
 	}
 	
-	public Piece getPieceAt(Position position) {
-		Square square = getSquareAt(position);
-		return square.getPiece();
+	public void setPiece(Position position, Piece piece) {
+		Square square = squares[position.getRow()][position.getCol()];
+		square.setPiece(piece);
 	}
 	
-	public void placePieceAt(Position position, Piece piece) {
-		Square square = getSquareAt(position);
-		Square newSquare = new Square(position, square.getColor(), piece);
-		squares.put(position, newSquare);
+	public int getRowSize() {
+		return squares.length;
 	}
 	
-	public Square getSquareAt(Position position) {
-		return squares.get(position);
+	public int getColSize() {
+		return squares[0].length;
 	}
 	
-	public boolean hasSquareAt(Position position) {
-		return squares.containsKey(position);
-	}
-	
-	public boolean hasPieceAt(Position position) {
-		Square square = getSquareAt(position);
-		
-		if (square.getPiece() == null) {
-			return false;
-		}
-		
-		return true;
-	}
-	
-	public int getNumRows() {
-		return numRows;
-	}
-	
-	public int getNumCols() {
-		return numCols;
-	}
-	
-	public void printSquareColors() {
-		for (int row = 0; row < numRows; row++) {
+	public void printPieces() {
+		for (int row = 0; row < getRowSize(); row++) {
 			String space = "";
 			
-			for (int col = 0; col < numCols; col++) {
-				Square square = getSquareAt(new Position(row, col));
+			for (int col = 0; col < getColSize(); col++) {
+				Square square = squares[row][col];
 				
-				if (square.getColor() == ChessColor.WHITE) {
-					System.out.print(space + "W");
+				if (square.isOccupied()) {
+					Piece piece = square.getPiece();
+					char abbr = piece.getAbbreviation();
+					
+					if (piece.isWhite()) {
+						abbr = Character.toUpperCase(abbr);
+					}
+					else {
+						abbr = Character.toLowerCase(abbr);
+					}
+					
+					System.out.print(space + abbr);
 				}
 				else {
-					System.out.print(space + "B");
+					System.out.print(space + " ");
 				}
 				
 				space = " ";
@@ -99,18 +81,18 @@ public class Board {
 		}
 	}
 	
-	public void printPieces() {		
-		for (int row = 0; row < numRows; row++) {
+	public void printSquareColors() {
+		for (int row = 0; row < getRowSize(); row++) {
 			String space = "";
 			
-			for (int col = 0; col < numCols; col++) {
-				Piece piece = getPieceAt(new Position(row, col));
+			for (int col = 0; col < getColSize(); col++) {
+				Square square = squares[row][col];
 				
-				if (piece != null) {
-					System.out.print(space + piece.getAbbreviation());
+				if (square.isWhite()) {
+					System.out.print(space + "W");
 				}
 				else {
-					System.out.print(" ");
+					System.out.print(space + "B");
 				}
 				
 				space = " ";

@@ -24,7 +24,7 @@ public class Game {
 		int kingRow, pawnRow;
 		
 		if (color == ChessColor.WHITE) {
-			kingRow = board.getNumRows() - 1;
+			kingRow = board.getRowSize() - 1;
 			pawnRow = kingRow - 1;
 		}
 		else {
@@ -32,17 +32,17 @@ public class Game {
 			pawnRow = kingRow + 1;
 		}
 		
-		board.placePieceAt(new Position(kingRow, 0), PieceFactory.createPiece(PieceType.ROOK, color));
-		board.placePieceAt(new Position(kingRow, 1), PieceFactory.createPiece(PieceType.KNIGHT, color));
-		board.placePieceAt(new Position(kingRow, 2), PieceFactory.createPiece(PieceType.BISHOP, color));
-		board.placePieceAt(new Position(kingRow, 3), PieceFactory.createPiece(PieceType.QUEEN, color));
-		board.placePieceAt(new Position(kingRow, 4), PieceFactory.createPiece(PieceType.KING, color));
-		board.placePieceAt(new Position(kingRow, 5), PieceFactory.createPiece(PieceType.BISHOP, color));
-		board.placePieceAt(new Position(kingRow, 6), PieceFactory.createPiece(PieceType.KNIGHT, color));
-		board.placePieceAt(new Position(kingRow, 7), PieceFactory.createPiece(PieceType.ROOK, color));
+		board.setPiece(new Position(kingRow, 0), PieceFactory.createPiece(PieceType.ROOK, color));
+		board.setPiece(new Position(kingRow, 1), PieceFactory.createPiece(PieceType.KNIGHT, color));
+		board.setPiece(new Position(kingRow, 2), PieceFactory.createPiece(PieceType.BISHOP, color));
+		board.setPiece(new Position(kingRow, 3), PieceFactory.createPiece(PieceType.QUEEN, color));
+		board.setPiece(new Position(kingRow, 4), PieceFactory.createPiece(PieceType.KING, color));
+		board.setPiece(new Position(kingRow, 5), PieceFactory.createPiece(PieceType.BISHOP, color));
+		board.setPiece(new Position(kingRow, 6), PieceFactory.createPiece(PieceType.KNIGHT, color));
+		board.setPiece(new Position(kingRow, 7), PieceFactory.createPiece(PieceType.ROOK, color));
 		
-		for (int col = 0; col < board.getNumCols(); col++) {
-			board.placePieceAt(new Position(pawnRow, col), PieceFactory.createPiece(PieceType.PAWN, color));
+		for (int col = 0; col < board.getColSize(); col++) {
+			board.setPiece(new Position(pawnRow, col), PieceFactory.createPiece(PieceType.PAWN, color));
 		}
 	}
 }

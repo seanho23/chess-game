@@ -5,8 +5,17 @@ public class Rook extends Piece {
 		super(PieceType.ROOK, color);
 	}
 	
+	// Rook moves within same row and column
 	@Override
-	public boolean getValidMoves(Position startPosition, Position endPosition) {
+	public boolean isPossibleMove(Position startPosition, Position endPosition) {
+		if (endPosition.equals(startPosition)) {
+			return false;
+		}
+		
+		if (startPosition.getRow() == endPosition.getRow() || startPosition.getCol() == endPosition.getCol()) {
+			return true;
+		}
+		
 		return false;
 	}
 }
