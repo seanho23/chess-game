@@ -1,8 +1,5 @@
 package com.seanhoapps.chessgame;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Board {
 	private Square[][] squares;
 	
