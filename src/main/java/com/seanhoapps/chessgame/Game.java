@@ -14,6 +14,187 @@ public class Game {
 		board.printPieces();
 	}
 	
+	public void validateMove(Position startPos, Position endPos) {
+		if (!board.isValidPosition(startPos) || !board.isValidPosition(endPos)) {
+			return;
+		}
+		
+		if (endPos.equals(startPos)) {
+			return;
+		}
+		
+		Square square = board.getSquare(startPos);
+		
+		if (!square.isOccupied()) {
+			return;
+		}
+		
+		Piece piece = square.getPiece();
+		
+		if (!piece.isPossibleMove(startPos, endPos)) {
+			return;
+		}
+		
+		Position[] movePath = piece.getMovePath(startPos, endPos);
+		
+		if (!isMovePathClear(movePath)) {
+			return;
+		}
+		
+		if (piece.getType().isKing()) {
+			validateCastle(startPos, endPos, piece);
+			return;
+		}
+		
+		// Perform move
+		movePiece(startPos, endPos);
+		// Log move
+	}
+	
+	public void validateCastle(Position startPos, Position endPos, Piece king) {
+		// King castling conditions
+		if (!king.getType().isKing()) {
+			return;
+		}
+		int colDiff = endPos.getCol() - startPos.getCol();
+		
+		if (king.hasMoved() || Math.abs(colDiff) != 2) {
+			return;
+		}
+		
+		// King cannot be in check
+		ChessColor enemyColor = getEnemyColor(king.getColor());
+		
+		if (isAttackableByColor(startPos, enemyColor)) {
+			return;
+		}
+		
+		// Rook castling conditions
+		int colDiffSign = Integer.signum(colDiff);
+		int rookCol = (colDiffSign > 0) ? board.getColSize() - 1 : 0;
+		Position rookPos = new Position(startPos.getRow(), rookCol);
+		Square rookSquare = board.getSquare(rookPos);
+		
+		if (!rookSquare.isOccupied()) {
+			return;
+		}
+		
+		Piece rook = rookSquare.getPiece();
+		
+		if (!rook.getType().isRook() || rook.hasMoved()) {
+			return;
+		}
+		
+		// No pieces between King and Rook
+		Position[] castlePath = getCastlePath(startPos, rookPos);
+		
+		if (!isMovePathClear(castlePath)) {
+			return;
+		}
+		
+		// King cannot move through check
+		Position[] movePath = king.getMovePath(startPos, endPos);
+		
+		if (isAttackableByColor(movePath[0], enemyColor)) {
+			return;
+		}
+		
+		// Perform castle
+		movePiece(startPos, endPos);
+		movePiece(rookPos, movePath[0]); // Rook is moved to square King moved through
+		// Log move
+	}
+	
+	public void movePiece(Position startPos, Position endPos) {
+		Piece piece = board.getPiece(startPos);
+		piece.hasMoved(true);
+		board.setPiece(endPos, piece);
+		board.setPiece(startPos, null);
+	}
+	
+	public boolean isChecked(ChessColor color) {
+		Position kingPos = getKingPosition(color);
+		ChessColor enemyColor = getEnemyColor(color);
+		return isAttackableByColor(kingPos, enemyColor);
+	}
+	
+	public boolean isAttackableByColor(Position endPos, ChessColor color) {
+		for (int row = 0; row < board.getRowSize(); row++) {
+			for (int col = 0; col < board.getColSize(); col++) {
+				Position startPos = new Position(row, col);
+				Square square = board.getSquare(startPos);
+				
+				if (square.isOccupied()) {
+					Piece piece = square.getPiece();
+					
+					if (piece.getColor() == color) {
+						if (piece.isPossibleMove(startPos, endPos)) {
+							Position[] movePath = piece.getMovePath(startPos, endPos);
+							
+							if (isMovePathClear(movePath)) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	public boolean isMovePathClear(Position[] movePath) {
+		if (movePath.length <= 0) {
+			return true;
+		}
+		
+		for (Position pos : movePath) {
+			if (board.getSquare(pos).isOccupied()) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public Position getKingPosition(ChessColor color) {
+		for (int row = 0; row < board.getRowSize(); row++) {
+			for (int col = 0; col < board.getColSize(); col++) {
+				Position pos = new Position(row, col);
+				Square square = board.getSquare(pos);
+				
+				if (square.isOccupied()) {
+					Piece piece = square.getPiece();
+					
+					if (piece.getType().isKing() && piece.getColor() == color) {
+						return pos;
+					}
+				}
+			}
+		}
+		
+		return null; // Should never happen because game should be over before King is captured
+	}
+	
+	public Position[] getCastlePath(Position kingPos, Position rookPos) {
+		int colDiff = rookPos.getCol() - kingPos.getCol();
+		int colDiffSign = Integer.signum(colDiff);
+		int pathLength = Math.abs(colDiff) - 1;
+		Position[] path = new Position[pathLength];
+		
+		for (int i = 1; i < pathLength; i++) {
+			int colOffset = i * colDiffSign;
+			path[i - 1] = new Position(kingPos.getRow(), kingPos.getCol() + colOffset);
+		}
+		
+		return path;
+	}
+	
+	public ChessColor getEnemyColor(ChessColor color) {
+		return (color.isWhite()) ? ChessColor.BLACK : ChessColor.WHITE;
+	}
+	
 	public void initBoard(int rowSize, int colSize) {
 		board = new Board(rowSize, colSize);
 		initPieces(ChessColor.WHITE);

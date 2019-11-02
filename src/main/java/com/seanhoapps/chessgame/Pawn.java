@@ -5,8 +5,8 @@ public class Pawn extends Piece {
 		super(PieceType.PAWN, color);
 	}
 	
-	// Pawn normally moves 1 space forward and captures 1 space diagonally forward
-	// It may move 2 spaces forward if it has not moved before
+	// Pawn normally moves 1 square forward and captures 1 square diagonally forward
+	// It may move 2 squares forward if it has not moved before
 	// En passant conditions are checked by Game
 	@Override
 	public boolean isPossibleMove(Position startPos, Position endPos) {
@@ -27,17 +27,17 @@ public class Pawn extends Piece {
 		int rowDiff = Math.abs(endRow - startRow);
 		int colDiff = Math.abs(endCol - startCol);
 		
-		// Move 1 space forward
+		// Move 1 square forward
 		if (rowDiff == 1) {
 			return true;
 		}
 		
-		// Capture 1 space diagonally forward
+		// Capture 1 square diagonally forward
 		if (rowDiff == 1 && colDiff == 1) {
 			return true;
 		}
 		
-		// Move 2 spaces forward
+		// Move 2 squares forward
 		if (!hasMoved() && rowDiff == 2) {
 			return true;
 		}
@@ -56,7 +56,7 @@ public class Pawn extends Piece {
 			path = new Position[0];
 		}
 		else {
-			// Moves 2 spaces
+			// Moves 2 squares
 			int rowOffset = Integer.signum(rowDiff);
 			path = new Position[1];
 			path[0] = new Position(startPos.getRow() + rowOffset, startPos.getCol());

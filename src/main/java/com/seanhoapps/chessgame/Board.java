@@ -48,6 +48,15 @@ public class Board {
 		return squares[pos.getRow()][pos.getCol()];
 	}
 	
+	public boolean isValidPosition(Position pos) {
+		int row = pos.getRow();
+		int col = pos.getCol();
+		int rowSize = getRowSize();
+		int colSize = getColSize();
+		
+		return row >= 0 && row < rowSize && col >= 0 && col < colSize;
+	}
+	
 	public int getRowSize() {
 		return squares.length;
 	}

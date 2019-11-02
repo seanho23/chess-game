@@ -22,10 +22,9 @@ public class Knight extends Piece {
 		return false;
 	}
 	
-	// Knight jumps over other pieces
 	@Override
 	public Position[] getMovePath(Position startPos, Position endPos) {
-		return new Position[0];
+		return new Position[0]; // Knight jumps over other pieces
 	}
 	
 	// King is already K
