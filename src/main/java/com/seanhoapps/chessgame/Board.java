@@ -34,9 +34,18 @@ public class Board {
 		}
 	}
 	
-	public void setPiece(Position position, Piece piece) {
-		Square square = squares[position.getRow()][position.getCol()];
+	public Piece getPiece(Position pos) {
+		Square square = getSquare(pos);
+		return square.getPiece();
+	}
+	
+	public void setPiece(Position pos, Piece piece) {
+		Square square = squares[pos.getRow()][pos.getCol()];
 		square.setPiece(piece);
+	}
+	
+	public Square getSquare(Position pos) {
+		return squares[pos.getRow()][pos.getCol()];
 	}
 	
 	public int getRowSize() {

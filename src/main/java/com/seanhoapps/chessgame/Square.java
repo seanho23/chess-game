@@ -13,11 +13,7 @@ public class Square {
 	}
 	
 	public boolean isWhite() {
-		if (color == ChessColor.WHITE) {
-			return true;
-		}
-		
-		return false;
+		return color.isWhite();
 	}
 	
 	public Piece getPiece() {
@@ -29,10 +25,6 @@ public class Square {
 	}
 	
 	public boolean isOccupied() {
-		if (piece != null) {
-			return true;
-		}
-		
-		return false;
+		return piece != null;
 	}
 }

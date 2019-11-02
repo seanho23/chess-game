@@ -30,9 +30,9 @@ public class Position {
 			return false;
 		}
 		
-		Position position = (Position) obj;
+		Position pos = (Position) obj;
 		
-		return row == position.getRow() && col == position.getCol();
+		return row == pos.getRow() && col == pos.getCol();
 	}
 	
 	@Override

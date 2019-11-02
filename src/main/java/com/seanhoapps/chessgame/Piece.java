@@ -3,14 +3,16 @@ package com.seanhoapps.chessgame;
 public abstract class Piece {
 	protected PieceType type;
 	protected ChessColor color;
-	protected int moveCount = 0;
+	protected boolean hasMoved = false;
 	
 	public Piece(PieceType type, ChessColor color) {
 		this.type = type;
 		this.color = color;
 	}
 	
-	public abstract boolean isPossibleMove(Position startPosition, Position endPosition);
+	public abstract boolean isPossibleMove(Position startPos, Position endPos);
+	
+	public abstract Position[] getMovePath(Position startPos, Position endPos);
 	
 	public PieceType getType() {
 		return type;
@@ -21,27 +23,15 @@ public abstract class Piece {
 	}
 	
 	public boolean isWhite() {
-		if (color == ChessColor.WHITE) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public int getMoveCount() {
-		return moveCount;
-	}
-	
-	public void setMoveCount(int newCount) {
-		moveCount = newCount;
+		return color.isWhite();
 	}
 	
 	public boolean hasMoved() {
-		if (moveCount > 0) {
-			return true;
-		}
-		
-		return false;
+		return hasMoved;
+	}
+	
+	public void hasMoved(boolean hasMoved) {
+		this.hasMoved = hasMoved;
 	}
 	
 	public char getAbbreviation() {

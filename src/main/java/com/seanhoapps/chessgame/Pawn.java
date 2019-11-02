@@ -9,35 +9,60 @@ public class Pawn extends Piece {
 	// It may move 2 spaces forward if it has not moved before
 	// En passant conditions are checked by Game
 	@Override
-	public boolean isPossibleMove(Position startPosition, Position endPosition) {
-		if (endPosition.equals(startPosition)) {
+	public boolean isPossibleMove(Position startPos, Position endPos) {
+		if (endPos.equals(startPos)) {
 			return false;
 		}
 		
-		int startRow = startPosition.getRow();
-		int startCol = startPosition.getCol();
-		int endRow = endPosition.getRow();
-		int endCol = endPosition.getCol();
+		int startRow = startPos.getRow();
+		int startCol = startPos.getCol();
+		int endRow = endPos.getRow();
+		int endCol = endPos.getCol();
 		
 		// Can only move forward
 		if ((isWhite() && endRow > startRow) || (!isWhite() && endRow < startRow)) {
 			return false;
 		}
 		
-		int diffRow = Math.abs(endRow - startRow);
-		int diffCol = Math.abs(endCol - startCol);
+		int rowDiff = Math.abs(endRow - startRow);
+		int colDiff = Math.abs(endCol - startCol);
 		
-		// Move 1 space forward or capture 1 space diagonally forward
-		if (diffRow <= 1 && diffCol <= 1) {
+		// Move 1 space forward
+		if (rowDiff == 1) {
+			return true;
+		}
+		
+		// Capture 1 space diagonally forward
+		if (rowDiff == 1 && colDiff == 1) {
 			return true;
 		}
 		
 		// Move 2 spaces forward
-		if (!hasMoved() && diffRow == 2) {
+		if (!hasMoved() && rowDiff == 2) {
 			return true;
-		}	
+		}
 		
 		return false;
+	}
+
+	@Override
+	public Position[] getMovePath(Position startPos, Position endPos) {
+		int rowDiff = endPos.getRow() - startPos.getRow();
+		int colDiff = endPos.getCol() - startPos.getCol();
+		Position[] path;
+		
+		// Normal moves and capture
+		if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) {
+			path = new Position[0];
+		}
+		else {
+			// Moves 2 spaces
+			int rowOffset = Integer.signum(rowDiff);
+			path = new Position[1];
+			path[0] = new Position(startPos.getRow() + rowOffset, startPos.getCol());
+		}
+		
+		return path;
 	}
 
 }
