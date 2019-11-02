@@ -2,10 +2,10 @@ package com.seanhoapps.chessgame;
 
 public class Game {
 	// Constants
-	static final int ROW_SIZE = 8;
-	static final int COL_SIZE = 8;
+	private static final int ROW_SIZE = 8;
+	private static final int COL_SIZE = 8;
 	
-	Board board;
+	private Board board;
 	
 	public Game(Player whitePlayer, Player blackPlayer) {
 		initBoard(ROW_SIZE, COL_SIZE);
@@ -23,7 +23,7 @@ public class Game {
 	public void initPieces(ChessColor color) {
 		int kingRow, pawnRow;
 		
-		if (color == ChessColor.WHITE) {
+		if (color.isWhite()) {
 			kingRow = board.getRowSize() - 1;
 			pawnRow = kingRow - 1;
 		}
@@ -32,17 +32,17 @@ public class Game {
 			pawnRow = kingRow + 1;
 		}
 		
-		board.placePiece(PieceFactory.createPiece(PieceType.ROOK, color), kingRow, 0);
-		board.placePiece(PieceFactory.createPiece(PieceType.KNIGHT, color), kingRow, 1);
-		board.placePiece(PieceFactory.createPiece(PieceType.BISHOP, color), kingRow, 2);
-		board.placePiece(PieceFactory.createPiece(PieceType.QUEEN, color), kingRow, 3);
-		board.placePiece(PieceFactory.createPiece(PieceType.KING, color), kingRow, 4);
-		board.placePiece(PieceFactory.createPiece(PieceType.BISHOP, color), kingRow, 5);
-		board.placePiece(PieceFactory.createPiece(PieceType.KNIGHT, color), kingRow, 6);
-		board.placePiece(PieceFactory.createPiece(PieceType.ROOK, color), kingRow, 7);
+		board.setPiece(new Position(kingRow, 0), PieceFactory.createPiece(PieceType.ROOK, color));
+		board.setPiece(new Position(kingRow, 1), PieceFactory.createPiece(PieceType.KNIGHT, color));
+		board.setPiece(new Position(kingRow, 2), PieceFactory.createPiece(PieceType.BISHOP, color));
+		board.setPiece(new Position(kingRow, 3), PieceFactory.createPiece(PieceType.QUEEN, color));
+		board.setPiece(new Position(kingRow, 4), PieceFactory.createPiece(PieceType.KING, color));
+		board.setPiece(new Position(kingRow, 5), PieceFactory.createPiece(PieceType.BISHOP, color));
+		board.setPiece(new Position(kingRow, 6), PieceFactory.createPiece(PieceType.KNIGHT, color));
+		board.setPiece(new Position(kingRow, 7), PieceFactory.createPiece(PieceType.ROOK, color));
 		
 		for (int col = 0; col < board.getColSize(); col++) {
-			board.placePiece(PieceFactory.createPiece(PieceType.PAWN, color), pawnRow, col);
+			board.setPiece(new Position(pawnRow, col), PieceFactory.createPiece(PieceType.PAWN, color));
 		}
 	}
 }

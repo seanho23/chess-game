@@ -5,9 +5,64 @@ public class Pawn extends Piece {
 		super(PieceType.PAWN, color);
 	}
 	
+	// Pawn normally moves 1 space forward and captures 1 space diagonally forward
+	// It may move 2 spaces forward if it has not moved before
+	// En passant conditions are checked by Game
 	@Override
-	public boolean isValidMove(Board board, int newRow, int newCol) {
+	public boolean isPossibleMove(Position startPos, Position endPos) {
+		if (endPos.equals(startPos)) {
+			return false;
+		}
+		
+		int startRow = startPos.getRow();
+		int startCol = startPos.getCol();
+		int endRow = endPos.getRow();
+		int endCol = endPos.getCol();
+		
+		// Can only move forward
+		if ((isWhite() && endRow > startRow) || (!isWhite() && endRow < startRow)) {
+			return false;
+		}
+		
+		int rowDiff = Math.abs(endRow - startRow);
+		int colDiff = Math.abs(endCol - startCol);
+		
+		// Move 1 space forward
+		if (rowDiff == 1) {
+			return true;
+		}
+		
+		// Capture 1 space diagonally forward
+		if (rowDiff == 1 && colDiff == 1) {
+			return true;
+		}
+		
+		// Move 2 spaces forward
+		if (!hasMoved() && rowDiff == 2) {
+			return true;
+		}
+		
 		return false;
+	}
+
+	@Override
+	public Position[] getMovePath(Position startPos, Position endPos) {
+		int rowDiff = endPos.getRow() - startPos.getRow();
+		int colDiff = endPos.getCol() - startPos.getCol();
+		Position[] path;
+		
+		// Normal moves and capture
+		if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) {
+			path = new Position[0];
+		}
+		else {
+			// Moves 2 spaces
+			int rowOffset = Integer.signum(rowDiff);
+			path = new Position[1];
+			path[0] = new Position(startPos.getRow() + rowOffset, startPos.getCol());
+		}
+		
+		return path;
 	}
 
 }

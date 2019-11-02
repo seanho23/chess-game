@@ -1,51 +1,43 @@
 package com.seanhoapps.chessgame;
 
 public abstract class Piece {
-	PieceType type;
-	ChessColor color;
-	int row;
-	int col;
+	protected PieceType type;
+	protected ChessColor color;
+	protected boolean hasMoved = false;
 	
 	public Piece(PieceType type, ChessColor color) {
 		this.type = type;
 		this.color = color;
 	}
 	
-	public abstract boolean isValidMove(Board board, int toRow, int toCol);
+	public abstract boolean isPossibleMove(Position startPos, Position endPos);
 	
-	// White pieces = upper case
-	// Black pieces = lower case
-	public char getAbbreviation() {
-		char abbr = type.toString().charAt(0);
-		
-		if (color == ChessColor.WHITE) {
-			return Character.toUpperCase(abbr);
-		}
-		else {
-			return Character.toLowerCase(abbr);
-		}
+	public abstract Position[] getMovePath(Position startPos, Position endPos);
+	
+	public PieceType getType() {
+		return type;
 	}
 	
 	public ChessColor getColor() {
 		return color;
 	}
 	
-	public int getRow() {
-		return row;
+	public boolean isWhite() {
+		return color.isWhite();
 	}
 	
-	public void setRow(int newRow) {
-		row = newRow;
+	public boolean hasMoved() {
+		return hasMoved;
 	}
 	
-	public int getCol() {
-		return col;
+	public void hasMoved(boolean hasMoved) {
+		this.hasMoved = hasMoved;
 	}
 	
-	public void setCol(int newCol) {
-		col = newCol;
+	public char getAbbreviation() {
+		return type.toString().charAt(0);
 	}
-	
+
 	@Override
 	public String toString() {
 		return type.toString();

@@ -1,7 +1,7 @@
 package com.seanhoapps.chessgame;
 
 public class Board {
-	Square[][] squares;
+	private Square[][] squares;
 	
 	public Board(int rowSize, int colSize) {
 		init(rowSize, colSize);
@@ -17,13 +17,16 @@ public class Board {
 		
 		for (int row = 0; row < getRowSize(); row++) {	
 			for (int col = 0; col < getColSize(); col++) {
+				Square square = null;
+				
 				if (isWhite) {
-					squares[row][col] = new Square(ChessColor.WHITE);
+					square = new Square(ChessColor.WHITE);
 				}
 				else {
-					squares[row][col] = new Square(ChessColor.BLACK);
+					square = new Square(ChessColor.BLACK);
 				}
 				
+				squares[row][col] = square;
 				isWhite = !isWhite;
 			}
 			
@@ -31,29 +34,47 @@ public class Board {
 		}
 	}
 	
-	public Piece getPiece(int row, int col) {
-		return squares[row][col].getPiece();
+	public Piece getPiece(Position pos) {
+		Square square = getSquare(pos);
+		return square.getPiece();
 	}
 	
-	public void placePiece(Piece piece, int row, int col) {
-		piece.setRow(row);
-		piece.setCol(col);
-		squares[row][col].setPiece(piece);
+	public void setPiece(Position pos, Piece piece) {
+		Square square = squares[pos.getRow()][pos.getCol()];
+		square.setPiece(piece);
 	}
 	
-	public void printPieces() {		
-		int rowSize = getRowSize();
-		
-		for (int row = 0; row < rowSize; row++) {
+	public Square getSquare(Position pos) {
+		return squares[pos.getRow()][pos.getCol()];
+	}
+	
+	public int getRowSize() {
+		return squares.length;
+	}
+	
+	public int getColSize() {
+		return squares[0].length;
+	}
+	
+	public void printPieces() {
+		for (int row = 0; row < getRowSize(); row++) {
 			String space = "";
 			
-			System.out.print(rowSize - row + " | ");
-			
 			for (int col = 0; col < getColSize(); col++) {
-				Piece piece = getPiece(row, col);
+				Square square = squares[row][col];
 				
-				if (piece != null) {
-					System.out.print(space + piece.getAbbreviation());
+				if (square.isOccupied()) {
+					Piece piece = square.getPiece();
+					char abbr = piece.getAbbreviation();
+					
+					if (piece.isWhite()) {
+						abbr = Character.toUpperCase(abbr);
+					}
+					else {
+						abbr = Character.toLowerCase(abbr);
+					}
+					
+					System.out.print(space + abbr);
 				}
 				else {
 					System.out.print(space + " ");
@@ -64,23 +85,16 @@ public class Board {
 			
 			System.out.println();
 		}
-		
-		System.out.println("--|----------------");
-		System.out.println("  | A B C D E F G H");
 	}
 	
-	public void printSquareColors() {		
-		int rowSize = getRowSize();
-		
-		for (int row = 0; row < rowSize; row++) {
+	public void printSquareColors() {
+		for (int row = 0; row < getRowSize(); row++) {
 			String space = "";
 			
-			System.out.print(rowSize - row + " | ");
-			
 			for (int col = 0; col < getColSize(); col++) {
-				ChessColor color = squares[row][col].getColor();
+				Square square = squares[row][col];
 				
-				if (color == ChessColor.WHITE) {
+				if (square.isWhite()) {
 					System.out.print(space + "W");
 				}
 				else {
@@ -92,26 +106,5 @@ public class Board {
 			
 			System.out.println();
 		}
-
-		System.out.println("--|----------------");
-		System.out.println("  | A B C D E F G H");
-	}
-	
-	public boolean isOccupied(int row, int col) {
-		Piece piece = getPiece(row, col);
-		
-		if (piece != null) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public int getRowSize() {
-		return squares.length;
-	}
-	
-	public int getColSize() {
-		return squares[0].length;
 	}
 }
