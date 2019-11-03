@@ -34,6 +34,10 @@ public abstract class Piece {
 		this.hasMoved = hasMoved;
 	}
 	
+	public boolean isSameColor(Piece piece) {
+		return color == piece.getColor();
+	}
+	
 	public char getAbbreviation() {
 		return type.toString().charAt(0);
 	}

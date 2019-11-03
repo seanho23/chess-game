@@ -14,12 +14,12 @@ public class Game {
 		board.printPieces();
 	}
 	
-	public void validateMove(Position startPos, Position endPos) {
-		if (!board.isValidPosition(startPos) || !board.isValidPosition(endPos)) {
+	public void performMove(Position startPos, Position endPos) {
+		if (endPos.equals(startPos)) {
 			return;
 		}
 		
-		if (endPos.equals(startPos)) {
+		if (!board.isValidPosition(startPos) || !board.isValidPosition(endPos)) {
 			return;
 		}
 		
@@ -29,7 +29,17 @@ public class Game {
 			return;
 		}
 		
+		// Piece cannot capture teammate
 		Piece piece = square.getPiece();
+		Square targetSquare = board.getSquare(endPos);
+		
+		if (targetSquare.isOccupied()) {
+			Piece targetPiece = targetSquare.getPiece();
+			
+			if (targetPiece.isSameColor(piece)) {
+				return;
+			}
+		}
 		
 		if (!piece.isPossibleMove(startPos, endPos)) {
 			return;
@@ -41,32 +51,69 @@ public class Game {
 			return;
 		}
 		
-		if (piece.getType().isKing()) {
-			validateCastle(startPos, endPos, piece);
+		if (isSpecialMove(startPos, endPos, piece)) {
 			return;
 		}
 		
 		// Perform move
 		movePiece(startPos, endPos);
-		// Log move
+		 // TODO: Log move
 	}
 	
-	public void validateCastle(Position startPos, Position endPos, Piece king) {
+	public void performCastle(Position startPos, Position endPos, Piece king) {
+		int colDiffSign = Integer.signum(endPos.getCol() - startPos.getCol());
+		int rookCol = (colDiffSign > 0) ? board.getColSize() - 1 : 0;
+		Position rookPos = new Position(startPos.getRow(), rookCol);
+		Position[] movePath = king.getMovePath(startPos, endPos);
+
+		movePiece(startPos, endPos);
+		movePiece(rookPos, movePath[0]); // Rook is moved to square King moved through
+		// TODO: Log move
+	}
+	
+	public void performPawnCapture(Position startPos, Position endPos) {
+		// TODO: Implement
+	}
+	
+	public boolean isSpecialMove(Position startPos, Position endPos, Piece piece) {
+		PieceType type = piece.getType();
+		
+		switch(type) {
+			case KING:
+				if (isValidCastle(startPos, endPos, piece)) {
+					performCastle(startPos, endPos, piece);
+					return true;
+				}
+				
+				break;
+			case PAWN:				
+				if (isValidPawnCapture(startPos, endPos, piece)) {
+					performPawnCapture(startPos, endPos);
+					return true;
+				}
+			default:
+				return false;
+		}
+		
+		return false;
+	}
+	
+	public boolean isValidCastle(Position startPos, Position endPos, Piece king) {
 		// King castling conditions
 		if (!king.getType().isKing()) {
-			return;
+			return false;
 		}
 		int colDiff = endPos.getCol() - startPos.getCol();
 		
 		if (king.hasMoved() || Math.abs(colDiff) != 2) {
-			return;
+			return false;
 		}
 		
 		// King cannot be in check
 		ChessColor enemyColor = getEnemyColor(king.getColor());
 		
 		if (isAttackableByColor(startPos, enemyColor)) {
-			return;
+			return false;
 		}
 		
 		// Rook castling conditions
@@ -76,33 +123,40 @@ public class Game {
 		Square rookSquare = board.getSquare(rookPos);
 		
 		if (!rookSquare.isOccupied()) {
-			return;
+			return false;
 		}
 		
 		Piece rook = rookSquare.getPiece();
 		
-		if (!rook.getType().isRook() || rook.hasMoved()) {
-			return;
+		if (!rook.getType().isRook() || !rook.isSameColor(king) || rook.hasMoved()) {
+			return false;
 		}
 		
 		// No pieces between King and Rook
 		Position[] castlePath = getCastlePath(startPos, rookPos);
 		
 		if (!isMovePathClear(castlePath)) {
-			return;
+			return false;
 		}
 		
 		// King cannot move through check
 		Position[] movePath = king.getMovePath(startPos, endPos);
 		
 		if (isAttackableByColor(movePath[0], enemyColor)) {
-			return;
+			return false;
 		}
 		
-		// Perform castle
-		movePiece(startPos, endPos);
-		movePiece(rookPos, movePath[0]); // Rook is moved to square King moved through
-		// Log move
+		return true;
+	}
+	
+	public boolean isValidPawnCapture(Position startPos, Position endPos, Piece pawn) {
+		if (!pawn.getType().isPawn()) {
+			return false;
+		}
+		
+		int rowDiff = Math.abs(endPos.getRow() - startPos.getRow());
+		int colDiff = Math.abs(endPos.getCol() - startPos.getCol());
+		return rowDiff == 1 && colDiff == 1;
 	}
 	
 	public void movePiece(Position startPos, Position endPos) {
