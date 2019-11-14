@@ -6,4 +6,8 @@ public enum ChessColor {
 	public boolean isWhite() {
 		return this == this.WHITE;
 	}
+		
+	public boolean isSameColor(ChessColor color) {
+		return this == color;
+	}
 }

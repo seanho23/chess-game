@@ -1,4 +1,7 @@
-package com.seanhoapps.chessgame;
+package com.seanhoapps.chessgame.pieces;
+
+import com.seanhoapps.chessgame.ChessColor;
+import com.seanhoapps.chessgame.Position;
 
 public abstract class Piece {
 	protected PieceType type;
@@ -10,9 +13,18 @@ public abstract class Piece {
 		this.color = color;
 	}
 	
+	// Copy constructor
+	public Piece(Piece piece) {
+		type = piece.getType();
+		color = piece.getColor();
+		hasMoved = piece.hasMoved();
+	}
+	
 	public abstract boolean isPossibleMove(Position startPos, Position endPos);
 	
 	public abstract Position[] getMovePath(Position startPos, Position endPos);
+	
+	public abstract Piece getCopy();
 	
 	public PieceType getType() {
 		return type;
@@ -22,26 +34,30 @@ public abstract class Piece {
 		return color;
 	}
 	
+	public boolean isSameColor(Piece piece) {
+		return color == piece.getColor();
+	}
+	
+	public boolean isSameColor(ChessColor color) {
+		return this.color == color;
+	}
+	
 	public boolean isWhite() {
 		return color.isWhite();
 	}
 	
-	public boolean hasMoved() {
-		return hasMoved;
+	public char getAbbreviation() {
+		return type.toString().charAt(0);
 	}
 	
 	public void hasMoved(boolean hasMoved) {
 		this.hasMoved = hasMoved;
 	}
 	
-	public boolean isSameColor(Piece piece) {
-		return color == piece.getColor();
+	public boolean hasMoved() {
+		return hasMoved;
 	}
-	
-	public char getAbbreviation() {
-		return type.toString().charAt(0);
-	}
-
+		
 	@Override
 	public String toString() {
 		return type.toString();

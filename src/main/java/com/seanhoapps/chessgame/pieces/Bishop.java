@@ -1,18 +1,25 @@
-package com.seanhoapps.chessgame;
+package com.seanhoapps.chessgame.pieces;
 
-public class Rook extends Piece {
-	public Rook(ChessColor color) {
-		super(PieceType.ROOK, color);
+import com.seanhoapps.chessgame.ChessColor;
+import com.seanhoapps.chessgame.Position;
+
+public class Bishop extends Piece {
+	public Bishop(ChessColor color) {
+		super(PieceType.BISHOP, color);
 	}
 	
-	// Rook moves within same row and column
+	// Copy constructor
+	public Bishop(Bishop bishop) {
+		super(bishop);
+	}
+	
+	// Bishop moves within same diagonals
 	@Override
 	public boolean isPossibleMove(Position startPos, Position endPos) {
-		if (endPos.equals(startPos)) {
-			return false;
-		}
+		int rowDiff = Math.abs(endPos.getRow() - startPos.getRow());
+		int colDiff = Math.abs(endPos.getCol() - startPos.getCol());
 		
-		if (startPos.getRow() == endPos.getRow() || startPos.getCol() == endPos.getCol()) {
+		if (rowDiff == colDiff) {
 			return true;
 		}
 		
@@ -25,7 +32,7 @@ public class Rook extends Piece {
 		int colDiff = endPos.getCol() - startPos.getCol();
 		int rowDiffSign = Integer.signum(rowDiff);
 		int colDiffSign = Integer.signum(colDiff);
-		int pathLength = Math.abs(rowDiff) + Math.abs(colDiff) - 1;
+		int pathLength = ((Math.abs(rowDiff) + Math.abs(colDiff)) / 2) - 1;
 		Position[] path = new Position[pathLength];
 
 		for (int i = 1; i <= pathLength; i++) {
@@ -35,5 +42,10 @@ public class Rook extends Piece {
 		}
 		
 		return path;
+	}
+	
+	@Override
+	public Piece getCopy() {
+		return new Bishop(this);
 	}
 }

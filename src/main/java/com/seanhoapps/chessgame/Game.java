@@ -1,265 +1,475 @@
 package com.seanhoapps.chessgame;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.seanhoapps.chessgame.pieces.Piece;
+import com.seanhoapps.chessgame.pieces.PieceType;
+
 public class Game {
 	// Constants
-	private static final int ROW_SIZE = 8;
-	private static final int COL_SIZE = 8;
+	private static final int ROW_COUNT = 8;
+	private static final int COL_COUNT = 8;
 	
-	private Board board;
+	private Board chessBoard;
+	private List<Board> boardHistory = new ArrayList<Board>();
+	private int totalMoves = 0;
 	
-	public Game(Player whitePlayer, Player blackPlayer) {
-		initBoard(ROW_SIZE, COL_SIZE);
-		board.printSquareColors();
-		System.out.println();
-		board.printPieces();
+	public Game() {
+		initBoard(ROW_COUNT, COL_COUNT);
 	}
 	
-	public void performMove(Position startPos, Position endPos) {
-		if (endPos.equals(startPos)) {
-			return;
+	public boolean doMove(Position startPos, Position endPos) {
+		if (!isPotentialMove(startPos, endPos)) {
+			return false;
 		}
 		
-		if (!board.isValidPosition(startPos) || !board.isValidPosition(endPos)) {
-			return;
+		if (!isLegalMove(startPos, endPos)) {
+			return false;
 		}
 		
-		Square square = board.getSquare(startPos);
+		// Passes all checks
 		
-		if (!square.isOccupied()) {
-			return;
-		}
-		
-		// Piece cannot capture teammate
-		Piece piece = square.getPiece();
-		Square targetSquare = board.getSquare(endPos);
-		
-		if (targetSquare.isOccupied()) {
-			Piece targetPiece = targetSquare.getPiece();
-			
-			if (targetPiece.isSameColor(piece)) {
-				return;
-			}
-		}
-		
-		if (!piece.isPossibleMove(startPos, endPos)) {
-			return;
-		}
-		
-		Position[] movePath = piece.getMovePath(startPos, endPos);
-		
-		if (!isMovePathClear(movePath)) {
-			return;
-		}
-		
-		if (isSpecialMove(startPos, endPos, piece)) {
-			return;
-		}
+		// Save current board for undo later
+		saveBoardState();
 		
 		// Perform move
-		movePiece(startPos, endPos);
-		 // TODO: Log move
-	}
-	
-	public void performCastle(Position startPos, Position endPos, Piece king) {
-		int colDiffSign = Integer.signum(endPos.getCol() - startPos.getCol());
-		int rookCol = (colDiffSign > 0) ? board.getColSize() - 1 : 0;
-		Position rookPos = new Position(startPos.getRow(), rookCol);
-		Position[] movePath = king.getMovePath(startPos, endPos);
-
-		movePiece(startPos, endPos);
-		movePiece(rookPos, movePath[0]); // Rook is moved to square King moved through
-		// TODO: Log move
-	}
-	
-	public void performPawnCapture(Position startPos, Position endPos) {
-		// TODO: Implement
-	}
-	
-	public boolean isSpecialMove(Position startPos, Position endPos, Piece piece) {
-		PieceType type = piece.getType();
+		if (isCastle(startPos, endPos, chessBoard)) {
+			doCastle(startPos, endPos, chessBoard);
+		}
+		else if (isPawnCapture(startPos, endPos, chessBoard)) {
+			doPawnCapture(startPos, endPos, chessBoard);
+		}
+		else {
+			chessBoard.capturePiece(endPos);
+			chessBoard.movePiece(startPos, endPos);
+		}
 		
-		switch(type) {
+		if (isPawnPromotion(startPos, endPos, chessBoard)) {
+			// Do pawn promotion
+			// Request user for piece
+		}
+		
+		// TODO: Check for stalemate
+		
+		// End game if move checkmated enemy
+		if (isGameOver()) {
+			// TODO: Implement game over
+			// Manage score
+		}
+		
+		totalMoves++;
+		return true;
+	}
+	
+	public boolean isLegalMove(Position startPos, Position endPos) {
+		// Ensure move does not place own King under attack
+		Board testBoard = chessBoard.getCopy();
+		
+		if (isCastle(startPos, endPos, testBoard)) {
+			doCastle(startPos, endPos, testBoard);
+		}
+		else if (isPawnCapture(startPos, endPos, testBoard)) {
+			doPawnCapture(startPos, endPos, testBoard);
+		}
+		else {
+			// Do normal move or capture
+			testBoard.capturePiece(endPos);
+			testBoard.movePiece(startPos, endPos);
+		}
+		
+		ChessColor color = testBoard.getPiece(startPos).getColor();
+
+		if (isChecked(color, testBoard)) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean isPotentialMove(Position startPos, Position endPos) {
+		// Cannot move in place
+		if (endPos.equals(startPos)) {
+			return false;
+		}
+		
+		// Positions must be within bounds of board
+		if (!chessBoard.isValidPosition(startPos) || !chessBoard.isValidPosition(endPos)) {
+			return false;
+		}
+		
+		// Cannot move an empty square
+		if (!chessBoard.isOccupied(startPos)) {
+			return false;
+		}
+		
+		// Cannot move enemy pieces
+		Piece piece = chessBoard.getPiece(startPos);
+
+		if (!piece.isSameColor(getTurnColor())) {
+			return false;
+		}
+		
+		// Cannot capture own pieces
+		if (chessBoard.isOccupied(endPos) && chessBoard.getPiece(endPos).isSameColor(piece)) {
+			return false;
+		}
+		
+		// Move must satisfy piece-specific movement conditions
+		if (!isNormalMove(startPos, endPos, chessBoard) || !isSpecialMove(startPos, endPos, chessBoard)) {
+			return false;
+		}
+
+		return true;
+	}
+	
+//	private void doMove(Position startPos, Position endPos, Board board) {
+//		if (isCastle(startPos, endPos, board)) {
+//			// Do castle
+//		}
+//		else if (isPawnCapture(startPos, endPos, board)) {
+//			// Do pawn capture
+//		}
+//		else if (isPawnPromotion(startPos, endPos, board)) {
+//			// Do pawn promotion
+//		}
+//		else {
+//			// Do normal move or capture
+//		}
+//	}
+//	
+//	private boolean isPotentialMove(Position startPos, Position endPos, Board board) {
+//		// Cannot move in place
+//		if (endPos.equals(startPos)) {
+//			return false;
+//		}
+//		
+//		// Positions must be within bounds of board
+//		if (!board.isValidPosition(startPos) || !board.isValidPosition(endPos)) {
+//			return false;
+//		}
+//		
+//		// Cannot move an empty square
+//		if (!board.isOccupied(startPos)) {
+//			return false;
+//		}
+//				
+//		// Cannot capture own pieces
+//		if (board.isOccupied(endPos) && board.getPiece(endPos).isSameColor(board.getPiece(startPos))) {
+//			return false;
+//		}
+//		
+//		// Move must satisfy piece-specific movement conditions
+//		if (!isNormalMove(startPos, endPos, board) || !isSpecialMove(startPos, endPos, board)) {
+//			return false;
+//		}
+//
+//		return true;
+//	}
+	
+	public boolean isNormalMove(Position startPos, Position endPos, Board board) {
+		Piece piece = board.getPiece(startPos);
+		
+		if (!piece.isPossibleMove(startPos, endPos)) {
+			return false;
+		}
+		
+		// Piece cannot move through other pieces
+		if (!board.isMovePathClear(piece.getMovePath(startPos, endPos))) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean isSpecialMove(Position startPos, Position endPos, Board board) {
+		Piece piece = board.getPiece(startPos);
+		
+		switch (piece.getType()) {
 			case KING:
-				if (isValidCastle(startPos, endPos, piece)) {
-					performCastle(startPos, endPos, piece);
+				if (isCastle(startPos, endPos, board)) {
 					return true;
 				}
-				
-				break;
-			case PAWN:				
-				if (isValidPawnCapture(startPos, endPos, piece)) {
-					performPawnCapture(startPos, endPos);
+			case PAWN:
+				if (isPawnCapture(startPos, endPos, board)) {
 					return true;
 				}
 			default:
 				return false;
 		}
-		
-		return false;
 	}
 	
-	public boolean isValidCastle(Position startPos, Position endPos, Piece king) {
+	public boolean isCastle(Position startPos, Position endPos, Board board) {
 		// King castling conditions
-		if (!king.getType().isKing()) {
+		Piece piece = board.getPiece(startPos);
+		
+		if (!piece.getType().isKing()) {
 			return false;
 		}
+		
 		int colDiff = endPos.getCol() - startPos.getCol();
 		
-		if (king.hasMoved() || Math.abs(colDiff) != 2) {
+		if (piece.hasMoved() || Math.abs(colDiff) != 2) {
 			return false;
 		}
 		
 		// King cannot be in check
-		ChessColor enemyColor = getEnemyColor(king.getColor());
+		ChessColor enemyColor = getEnemyColor(piece.getColor());
 		
-		if (isAttackableByColor(startPos, enemyColor)) {
+		if (isUnderAttackByColor(startPos, enemyColor, board)) {
+			return false;
+		}
+		
+		// King cannot castle into check
+		if (isUnderAttackByColor(endPos, enemyColor, board)) {
+			return false;
+		}
+		
+		// King cannot castle through check		
+		if (isUnderAttackByColor(piece.getMovePath(startPos, endPos)[0], enemyColor, board)) {
 			return false;
 		}
 		
 		// Rook castling conditions
-		int colDiffSign = Integer.signum(colDiff);
-		int rookCol = (colDiffSign > 0) ? board.getColSize() - 1 : 0;
+		int rookCol = (Integer.signum(colDiff) > 0) ? board.getColCount() - 1 : 0;
 		Position rookPos = new Position(startPos.getRow(), rookCol);
-		Square rookSquare = board.getSquare(rookPos);
 		
-		if (!rookSquare.isOccupied()) {
+		if (!board.isOccupied(rookPos)) {
 			return false;
 		}
 		
-		Piece rook = rookSquare.getPiece();
+		Piece rook = board.getPiece(rookPos);
 		
-		if (!rook.getType().isRook() || !rook.isSameColor(king) || rook.hasMoved()) {
+		if (!rook.getType().isRook() || !rook.isSameColor(piece) || rook.hasMoved()) {
 			return false;
 		}
 		
-		// No pieces between King and Rook
-		Position[] castlePath = getCastlePath(startPos, rookPos);
-		
-		if (!isMovePathClear(castlePath)) {
-			return false;
-		}
-		
-		// King cannot move through check
-		Position[] movePath = king.getMovePath(startPos, endPos);
-		
-		if (isAttackableByColor(movePath[0], enemyColor)) {
+		// Path between King and Rook must be clear
+		if (!board.isMovePathClear(rook.getMovePath(rookPos, startPos))) {
 			return false;
 		}
 		
 		return true;
 	}
 	
-	public boolean isValidPawnCapture(Position startPos, Position endPos, Piece pawn) {
-		if (!pawn.getType().isPawn()) {
+	public boolean isPawnCapture(Position startPos, Position endPos, Board board) {
+		Piece piece = board.getPiece(startPos);
+		
+		if (!piece.getType().isPawn()) {
 			return false;
 		}
 		
-		int rowDiff = Math.abs(endPos.getRow() - startPos.getRow());
-		int colDiff = Math.abs(endPos.getCol() - startPos.getCol());
-		return rowDiff == 1 && colDiff == 1;
+		// Can only move forward
+		if ((piece.isWhite() && endPos.getRow() > startPos.getRow()) || (!piece.isWhite() && endPos.getRow() < startPos.getRow())) {
+			return false;
+		}
+		
+		// Can only capture diagonally
+		int rowDiff = endPos.getRow() - startPos.getRow();
+		int colDiff = endPos.getCol() - startPos.getCol();
+		
+		if (Math.abs(rowDiff) != 1 && Math.abs(colDiff) != 1) {
+			return false;
+		}
+		
+		if (!board.isOccupied(endPos)) {
+			if (!isEnPassant(startPos, endPos, board)) {
+				return false;
+			}
+		}
+		
+		// Cannot capture teammate
+		Piece targetPiece = board.getPiece(endPos);
+		
+		if (targetPiece.isSameColor(piece)) {
+			return false;
+		}
+		
+		return true;
 	}
 	
-	public void movePiece(Position startPos, Position endPos) {
+	public boolean isEnPassant(Position startPos, Position endPos, Board board) {
+		// Not en passant if there is any piece diagonally forward
+		if (board.isOccupied(endPos)) {
+			return false;
+		}
+		
 		Piece piece = board.getPiece(startPos);
-		piece.hasMoved(true);
-		board.setPiece(endPos, piece);
-		board.setPiece(startPos, null);
+		
+		if (!piece.getType().isPawn()) {
+			return false;
+		}
+		
+		// Enemy pawn has to have moved the previous turn
+		Board lastBoard = getLastBoardState();
+		int rowOffset = Integer.signum(endPos.getRow() - startPos.getRow());
+		Position enemyStartPos = new Position(endPos.getRow() + rowOffset, endPos.getCol());
+		Position enemyEndPos = new Position(endPos.getRow() - rowOffset, endPos.getCol());
+		
+		if (!lastBoard.isOccupied(enemyStartPos) || lastBoard.isOccupied(enemyEndPos)) {
+			return false;
+		}
+		
+		Piece enemyPieceStart = lastBoard.getPiece(enemyStartPos);
+		
+		if (!enemyPieceStart.getType().isPawn() || enemyPieceStart.isSameColor(piece) || enemyPieceStart.hasMoved()) {
+			return false;
+		}
+		
+		// Enemy pawn has to have moved 2 squares
+		if (!board.isOccupied(enemyEndPos) || board.isOccupied(enemyStartPos)) {
+			return false;
+		}
+		
+		Piece enemyPieceEnd = board.getPiece(enemyEndPos);
+		
+		if (!enemyPieceEnd.getType().isPawn() || enemyPieceEnd.isSameColor(piece)) {
+			return false;
+		}
+		
+		return true;
 	}
 	
-	public boolean isChecked(ChessColor color) {
-		Position kingPos = getKingPosition(color);
-		ChessColor enemyColor = getEnemyColor(color);
-		return isAttackableByColor(kingPos, enemyColor);
+	public boolean isPawnPromotion(Position startPos, Position endPos, Board board) {
+		Piece piece = board.getPiece(startPos);
+		
+		if (!piece.getType().isPawn()) {
+			return false;
+		}
+		
+		if ((piece.isWhite() && endPos.getRow() > 0) || (!piece.isWhite() && endPos.getRow() < board.getRowCount() - 1)) {
+			return false;
+		}
+		
+		return true;
 	}
 	
-	public boolean isAttackableByColor(Position endPos, ChessColor color) {
-		for (int row = 0; row < board.getRowSize(); row++) {
-			for (int col = 0; col < board.getColSize(); col++) {
-				Position startPos = new Position(row, col);
-				Square square = board.getSquare(startPos);
-				
-				if (square.isOccupied()) {
-					Piece piece = square.getPiece();
-					
-					if (piece.getColor() == color) {
-						if (piece.isPossibleMove(startPos, endPos)) {
-							Position[] movePath = piece.getMovePath(startPos, endPos);
-							
-							if (isMovePathClear(movePath)) {
-								return true;
-							}
-						}
-					}
-				}
+	public void doCastle(Position startPos, Position endPos, Board board) {
+		Piece king = board.getPiece(startPos);
+		int colDiff = endPos.getCol() - startPos.getCol();
+		int rookCol = (Integer.signum(colDiff) > 0) ? board.getColCount() - 1 : 0;
+		Position rookStartPos = new Position(startPos.getRow(), rookCol);
+		Position rookEndPos = king.getMovePath(startPos, endPos)[0]; // Rook is moved to square King moved through
+		
+		board.movePiece(startPos, endPos); // Move King to new square after castle
+		board.movePiece(rookStartPos, rookEndPos); // Move Rook to new square after castle
+	}
+
+	public void doPawnCapture(Position startPos, Position endPos, Board board) {
+		if (isEnPassant(startPos, endPos, board)) {
+			int rowOffset = Integer.signum(endPos.getRow() - startPos.getRow());
+			Position enemyPawnPos = new Position(endPos.getRow() - rowOffset, endPos.getCol());
+			board.capturePiece(enemyPawnPos);
+		}
+		
+		board.capturePiece(endPos);
+		board.movePiece(startPos, endPos);
+	}
+	
+	public boolean isUnderAttackByColor(Position endPos, ChessColor color, Board board) {
+		Set<Position> currentPositions = board.getPositionsByColor(color);
+		
+		for (Position startPos : currentPositions) {
+			Piece piece = board.getPiece(startPos);
+			
+			if (board.isMovePathClear(piece.getMovePath(startPos, endPos))) {
+				return true;
 			}
 		}
 		
 		return false;
 	}
 	
+	public boolean isGameOver() {
+		return isCheckmated(ChessColor.WHITE) || isCheckmated(ChessColor.BLACK); 
+	}
 	
-	public boolean isMovePathClear(Position[] movePath) {
-		if (movePath.length <= 0) {
-			return true;
-		}
+	public boolean isCheckmated(ChessColor color) {
+		// Check if color is checked
 		
-		for (Position pos : movePath) {
-			if (board.getSquare(pos).isOccupied()) {
-				return false;
-			}
-		}
+		// Get enemy positions
+		// Get king position
+		
+		// King is in check
+		
+		// Check if king can move out of the way
+		
+		// Check if teammates can block the path
 		
 		return true;
 	}
 	
-	public Position getKingPosition(ChessColor color) {
-		for (int row = 0; row < board.getRowSize(); row++) {
-			for (int col = 0; col < board.getColSize(); col++) {
-				Position pos = new Position(row, col);
-				Square square = board.getSquare(pos);
-				
-				if (square.isOccupied()) {
-					Piece piece = square.getPiece();
-					
-					if (piece.getType().isKing() && piece.getColor() == color) {
-						return pos;
-					}
-				}
-			}
-		}
-		
-		return null; // Should never happen because game should be over before King is captured
+	public boolean isChecked(ChessColor color, Board board) {
+		return isUnderAttackByColor(board.getKingPositionByColor(color), getEnemyColor(color), board);
 	}
 	
-	public Position[] getCastlePath(Position kingPos, Position rookPos) {
-		int colDiff = rookPos.getCol() - kingPos.getCol();
-		int colDiffSign = Integer.signum(colDiff);
-		int pathLength = Math.abs(colDiff) - 1;
-		Position[] path = new Position[pathLength];
-		
-		for (int i = 1; i < pathLength; i++) {
-			int colOffset = i * colDiffSign;
-			path[i - 1] = new Position(kingPos.getRow(), kingPos.getCol() + colOffset);
+	private void saveBoardState() {
+		boardHistory.add(chessBoard.getCopy());
+	}
+	
+	private Board getLastBoardState() {
+		return boardHistory.get(boardHistory.size() - 1);
+	}
+	
+	public void undoLastMove() {
+		if (isHistoryEmpty()) {
+			// TODO: Throw exception
+			return;
 		}
 		
-		return path;
+		int lastIndex = boardHistory.size() - 1;
+		
+		chessBoard = boardHistory.get(lastIndex);
+		boardHistory.remove(lastIndex);
+	}
+	
+	public boolean isHistoryEmpty() {
+		return boardHistory.isEmpty();
 	}
 	
 	public ChessColor getEnemyColor(ChessColor color) {
 		return (color.isWhite()) ? ChessColor.BLACK : ChessColor.WHITE;
 	}
 	
-	public void initBoard(int rowSize, int colSize) {
-		board = new Board(rowSize, colSize);
-		initPieces(ChessColor.WHITE);
-		initPieces(ChessColor.BLACK);
+	public ChessColor getTurnColor() {
+		return (totalMoves % 2 == 0) ? ChessColor.WHITE : ChessColor.BLACK;
 	}
+	
+	/*
+	 *  Chess Board Layout
+	 * 
+	 *    ,-----------------,
+	 *  0 | r n b q k b n r |
+	 *  1 | p p p p p p p p |
+     *  2 |				    |
+     *  3 |			        |
+     *  4 |			        |
+     *  5 |				    |
+	 *  6 | P P P P P P P P |
+	 *  7 | R N B Q K B N R |
+	 *    '-----------------'
+	 *      0 1 2 3 4 5 6 7
+	 *
+	 *  Black Pieces - lower case
+	 *  White Pieces - UPPER case
+	 *  
+	 *  R - Rook
+	 *  N - Knight
+	 *  B - Bishop
+	 *  Q - Queen
+	 *  K - King
+	 *  P - Pawn
+	 */
 	
 	public void initPieces(ChessColor color) {
 		int kingRow, pawnRow;
 		
+		// Black pieces will be placed on first 2 rows
+		// White pieces will be placed on last 2 rows
 		if (color.isWhite()) {
-			kingRow = board.getRowSize() - 1;
+			kingRow = chessBoard.getRowCount() - 1;
 			pawnRow = kingRow - 1;
 		}
 		else {
@@ -267,17 +477,23 @@ public class Game {
 			pawnRow = kingRow + 1;
 		}
 		
-		board.setPiece(new Position(kingRow, 0), PieceFactory.createPiece(PieceType.ROOK, color));
-		board.setPiece(new Position(kingRow, 1), PieceFactory.createPiece(PieceType.KNIGHT, color));
-		board.setPiece(new Position(kingRow, 2), PieceFactory.createPiece(PieceType.BISHOP, color));
-		board.setPiece(new Position(kingRow, 3), PieceFactory.createPiece(PieceType.QUEEN, color));
-		board.setPiece(new Position(kingRow, 4), PieceFactory.createPiece(PieceType.KING, color));
-		board.setPiece(new Position(kingRow, 5), PieceFactory.createPiece(PieceType.BISHOP, color));
-		board.setPiece(new Position(kingRow, 6), PieceFactory.createPiece(PieceType.KNIGHT, color));
-		board.setPiece(new Position(kingRow, 7), PieceFactory.createPiece(PieceType.ROOK, color));
+		chessBoard.initPiece(new Position(kingRow, 0), PieceFactory.createPiece(PieceType.ROOK, color));
+		chessBoard.initPiece(new Position(kingRow, 1), PieceFactory.createPiece(PieceType.KNIGHT, color));
+		chessBoard.initPiece(new Position(kingRow, 2), PieceFactory.createPiece(PieceType.BISHOP, color));
+		chessBoard.initPiece(new Position(kingRow, 3), PieceFactory.createPiece(PieceType.QUEEN, color));
+		chessBoard.initPiece(new Position(kingRow, 4), PieceFactory.createPiece(PieceType.KING, color));
+		chessBoard.initPiece(new Position(kingRow, 5), PieceFactory.createPiece(PieceType.BISHOP, color));
+		chessBoard.initPiece(new Position(kingRow, 6), PieceFactory.createPiece(PieceType.KNIGHT, color));
+		chessBoard.initPiece(new Position(kingRow, 7), PieceFactory.createPiece(PieceType.ROOK, color));
 		
-		for (int col = 0; col < board.getColSize(); col++) {
-			board.setPiece(new Position(pawnRow, col), PieceFactory.createPiece(PieceType.PAWN, color));
+		for (int col = 0, colCount = chessBoard.getColCount(); col < colCount; col++) {
+			chessBoard.initPiece(new Position(pawnRow, col), PieceFactory.createPiece(PieceType.PAWN, color));
 		}
+	}
+	
+	public void initBoard(int rowCount, int colCount) {
+		chessBoard = new Board(rowCount, colCount);
+		initPieces(ChessColor.WHITE);
+		initPieces(ChessColor.BLACK);
 	}
 }

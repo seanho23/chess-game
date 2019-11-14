@@ -1,4 +1,4 @@
-package com.seanhoapps.chessgame;
+package com.seanhoapps.chessgame.pieces;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,6 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.seanhoapps.chessgame.ChessColor;
+import com.seanhoapps.chessgame.Position;
+import com.seanhoapps.chessgame.pieces.Piece;
+import com.seanhoapps.chessgame.pieces.Rook;
 
 public class RookTest {
 	private Piece rook;
@@ -47,13 +52,6 @@ public class RookTest {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(4, 5);
 		assertTrue(rook.isPossibleMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_startEqualsEnd_returnFalse() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(4, 3);
-		assertFalse(rook.isPossibleMove(startPos, endPos));
 	}
 	
 	@Test
