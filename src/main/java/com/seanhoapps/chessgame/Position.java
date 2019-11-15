@@ -8,22 +8,12 @@ public class Position {
 		this.col = col;
 	}
 	
-	// Copy constructor
-	public Position(Position pos) {
-		row = pos.getRow();
-		col = pos.getCol();
-	}
-	
 	public int getRow() {
 		return row;
 	}
 	
 	public int getCol() {
 		return col;
-	}
-	
-	public Position getCopy() {
-		return new Position(this);
 	}
 	
 	@Override

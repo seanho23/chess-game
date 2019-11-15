@@ -100,14 +100,14 @@ public class PawnTest {
 	
 	@Test
 	public void getMovePath_moveOneSquare_returnEmptyPosArray() {
-		Position[] expectedPath = new Position[0];
+		Position[] expectedPath = new Position[] {new Position(5, 3)};
 		Position[] actualPath = whitePawn.getMovePath(new Position(6, 3), new Position(5, 3));
 		assertArrayEquals(expectedPath, actualPath);
 	}
 	
 	@Test
 	public void getMovePath_moveTwoSquares_returnPosArray() {
-		Position[] expectedPath = new Position[] {new Position(5, 3)};
+		Position[] expectedPath = new Position[] {new Position(5, 3), new Position(4, 3)};
 		Position[] actualPath = whitePawn.getMovePath(new Position(6, 3), new Position(4, 3));
 		assertArrayEquals(expectedPath, actualPath);
 	}
