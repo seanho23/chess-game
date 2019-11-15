@@ -1,4 +1,4 @@
-package com.seanhoapps.chessgame;
+package com.seanhoapps.chessgame.pieces;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,6 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.seanhoapps.chessgame.ChessColor;
+import com.seanhoapps.chessgame.Position;
+import com.seanhoapps.chessgame.pieces.Pawn;
+import com.seanhoapps.chessgame.pieces.Piece;
 
 public class PawnTest {
 	private Piece whitePawn;
@@ -35,27 +40,6 @@ public class PawnTest {
 		Position startPos = new Position(6, 3);
 		Position endPos = new Position(4, 3);
 		assertTrue(whitePawn.isPossibleMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_moveUpLeft_returnTrue() {
-		Position startPos = new Position(6, 3);
-		Position endPos = new Position(5, 2);
-		assertTrue(whitePawn.isPossibleMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_moveUpRight_returnTrue() {
-		Position startPos = new Position(6, 3);
-		Position endPos = new Position(5, 4);
-		assertTrue(whitePawn.isPossibleMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_startEqualsEnd_returnFalse() {
-		Position startPos = new Position(6, 3);
-		Position endPos = new Position(6, 3);
-		assertFalse(whitePawn.isPossibleMove(startPos, endPos));
 	}
 	
 	@Test
@@ -116,21 +100,14 @@ public class PawnTest {
 	
 	@Test
 	public void getMovePath_moveOneSquare_returnEmptyPosArray() {
-		Position[] expectedPath = new Position[0];
+		Position[] expectedPath = new Position[] {new Position(5, 3)};
 		Position[] actualPath = whitePawn.getMovePath(new Position(6, 3), new Position(5, 3));
 		assertArrayEquals(expectedPath, actualPath);
 	}
 	
 	@Test
-	public void getMovePath_moveDiagonallyOneSquare_returnEmptyPosArray() {
-		Position[] expectedPath = new Position[0];
-		Position[] actualPath = whitePawn.getMovePath(new Position(6, 3), new Position(5, 2));
-		assertArrayEquals(expectedPath, actualPath);
-	}
-	
-	@Test
 	public void getMovePath_moveTwoSquares_returnPosArray() {
-		Position[] expectedPath = new Position[] {new Position(5, 3)};
+		Position[] expectedPath = new Position[] {new Position(5, 3), new Position(4, 3)};
 		Position[] actualPath = whitePawn.getMovePath(new Position(6, 3), new Position(4, 3));
 		assertArrayEquals(expectedPath, actualPath);
 	}

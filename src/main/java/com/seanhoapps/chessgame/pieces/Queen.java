@@ -1,17 +1,21 @@
-package com.seanhoapps.chessgame;
+package com.seanhoapps.chessgame.pieces;
+
+import com.seanhoapps.chessgame.ChessColor;
+import com.seanhoapps.chessgame.Position;
 
 public class Queen extends Piece {
 	public Queen(ChessColor color) {
 		super(PieceType.QUEEN, color);
 	}
 	
+	// Copy constructor
+	public Queen(Queen queen) {
+		super(queen);
+	}
+	
 	// Queen moves within same row, column, and diagonals
 	@Override
 	public boolean isPossibleMove(Position startPos, Position endPos) {
-		if (endPos.equals(startPos)) {
-			return false;
-		}
-		
 		int startRow = startPos.getRow();
 		int startCol = startPos.getCol();
 		int endRow = endPos.getRow();
@@ -69,5 +73,10 @@ public class Queen extends Piece {
 		}
 		
 		return path;
+	}
+	
+	@Override
+	public Piece getCopy() {
+		return new Queen(this);
 	}
 }

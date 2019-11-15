@@ -1,5 +1,14 @@
 package com.seanhoapps.chessgame;
 
+import com.seanhoapps.chessgame.pieces.Bishop;
+import com.seanhoapps.chessgame.pieces.King;
+import com.seanhoapps.chessgame.pieces.Knight;
+import com.seanhoapps.chessgame.pieces.Pawn;
+import com.seanhoapps.chessgame.pieces.Piece;
+import com.seanhoapps.chessgame.pieces.PieceType;
+import com.seanhoapps.chessgame.pieces.Queen;
+import com.seanhoapps.chessgame.pieces.Rook;
+
 public class PieceFactory {
 	public static Piece createPiece(PieceType type, ChessColor color) {
 		Piece piece = null;

@@ -37,6 +37,6 @@ public class Position {
 	
 	@Override
 	public int hashCode() {
-		return Integer.parseInt("" + row + col);
+		return row * 31 + col;
 	}
 }

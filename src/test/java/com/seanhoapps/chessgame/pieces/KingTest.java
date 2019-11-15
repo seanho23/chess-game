@@ -1,4 +1,4 @@
-package com.seanhoapps.chessgame;
+package com.seanhoapps.chessgame.pieces;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,6 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.seanhoapps.chessgame.ChessColor;
+import com.seanhoapps.chessgame.Position;
+import com.seanhoapps.chessgame.pieces.King;
+import com.seanhoapps.chessgame.pieces.Piece;
 
 public class KingTest {
 	private Piece king;
@@ -78,44 +83,7 @@ public class KingTest {
 	}
 	
 	@Test
-	public void isPossibleMove_whiteQueensideCastleBeforeMoving_returnTrue() {
-		Position startPos = new Position(7, 4);
-		Position endPos = new Position(7, 2);
-		assertTrue(king.isPossibleMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_whiteKingsideCastleBeforeMoving_returnTrue() {
-		Position startPos = new Position(7, 4);
-		Position endPos = new Position(7, 6);
-		assertTrue(king.isPossibleMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_startEqualsEnd_returnFalse() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(4, 3);
-		assertFalse(king.isPossibleMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_whiteQueensideCastleAfterMoving_returnFalse() {
-		Position startPos = new Position(7, 4);
-		Position endPos = new Position(7, 2);
-		king.hasMoved(true);
-		assertFalse(king.isPossibleMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_whiteKingsideCastleAfterMoving_returnFalse() {
-		Position startPos = new Position(7, 4);
-		Position endPos = new Position(7, 6);
-		king.hasMoved(true);
-		assertFalse(king.isPossibleMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_moveMultipleSquaresNotCastling_returnFalse() {
+	public void isPossibleMove_moveMultipleSquares_returnFalse() {
 		Position startPos = new Position(7, 4);
 		Position endPos = new Position(5, 4);
 		assertFalse(king.isPossibleMove(startPos, endPos));
@@ -138,13 +106,6 @@ public class KingTest {
 	public void getMovePath_moveOneSquare_returnEmptyPosArray() {
 		Position[] expectedPath = new Position[0];
 		Position[] actualPath = king.getMovePath(new Position(4, 3), new Position(3, 3));
-		assertArrayEquals(expectedPath, actualPath);
-	}
-	
-	@Test
-	public void getMovePath_whiteKingsideCastle_returnPosArray() {
-		Position[] expectedPath = new Position[] {new Position(7, 5)};
-		Position[] actualPath = king.getMovePath(new Position(7, 4), new Position(7, 6));
 		assertArrayEquals(expectedPath, actualPath);
 	}
 }

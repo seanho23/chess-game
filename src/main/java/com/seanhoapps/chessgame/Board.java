@@ -1,110 +1,309 @@
 package com.seanhoapps.chessgame;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.seanhoapps.chessgame.pieces.Piece;
+
 public class Board {
-	private Square[][] squares;
+	private final int rowCount;
+	private final int colCount;
+	private final int squareCount;
 	
-	public Board(int rowSize, int colSize) {
-		init(rowSize, colSize);
-	}
+	private Square[] boardSquares;
+	private Set<Position> whitePositions = new HashSet<Position>();
+	private Set<Position> blackPositions = new HashSet<Position>();
+	private Position whiteKingPosition;
+	private Position blackKingPosition;
 	
-	public void init(int rowSize, int colSize) {
-		squares = new Square[rowSize][colSize];
+	public Board(int rowCount, int colCount) {
+		this.rowCount = rowCount;
+		this.colCount = colCount;
+		this.squareCount = this.rowCount * this.colCount;
+		boardSquares = new Square[getSquareCount()];
 		initSquares();
 	}
 	
-	public void initSquares() {		
-		boolean isWhite = true;
+	// Copy constructor
+	private Board(Board board) {
+		rowCount = board.getRowCount();
+		colCount = board.getColCount();
+		squareCount = board.getSquareCount();
+		boardSquares = new Square[squareCount];
+		copyBoard(board);
+	}
+	
+	public void initPiece(Position pos, Piece piece) {
+		rangeCheck(pos);
 		
-		for (int row = 0; row < getRowSize(); row++) {	
-			for (int col = 0; col < getColSize(); col++) {
-				Square square = null;
-				
-				if (isWhite) {
-					square = new Square(ChessColor.WHITE);
-				}
-				else {
-					square = new Square(ChessColor.BLACK);
-				}
-				
-				squares[row][col] = square;
-				isWhite = !isWhite;
-			}
-			
-			isWhite = !isWhite; // First square in row is same color as last square in previous row
+		setPiece(pos, piece);
+		
+		// Store positions for faster access later
+		ChessColor color = piece.getColor();
+		
+		getPositionsByColor(color).add(pos);
+		
+		// Store King position separately
+		if (piece.getType().isKing()) {
+			setKingPositionByColor(color, pos);
 		}
+	}
+	
+	public void movePiece(Position startPos, Position endPos) {
+		rangeCheck(startPos);
+		rangeCheck(endPos);
+		
+		Piece piece = getPiece(startPos);
+		
+		// Move piece
+		setPiece(endPos, piece);
+		setPiece(startPos, null);
+		piece.hasMoved(true);
+		
+		// Store positions for faster access later
+		ChessColor color = piece.getColor();
+		Set<Position> positions = getPositionsByColor(color);
+		
+		positions.remove(startPos);
+		positions.add(endPos);
+		
+		// Store King position separately
+		if (piece.getType().isKing()) {
+			setKingPositionByColor(color, endPos);
+		}
+	}
+	
+	public void capturePiece(Position pos) {
+		rangeCheck(pos);
+		
+		if (!isOccupied(pos)) {
+			return;
+		}
+		
+		ChessColor color = getPiece(pos).getColor();
+		
+		setPiece(pos, null);
+		getPositionsByColor(color).remove(pos);
+	}
+	
+	public boolean isMovePathClear(Position[] movePath) {
+		if (movePath.length <= 0) {
+			return true;
+		}
+		
+		for (Position pos : movePath) {
+			if (isOccupied(pos)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean isValidPosition(Position pos) {
+		int i = positionToIndex(pos);
+		return i >= 0 && i < getSquareCount();
+	}
+	
+	public Set<Position> getPositionsByColor(ChessColor color) {
+		return (color.isWhite()) ? whitePositions : blackPositions;
+	}
+	
+	public Position getKingPositionByColor(ChessColor color) {
+		return (color.isWhite()) ? whiteKingPosition : blackKingPosition;
+	}
+	
+	public Piece getPiece(int i) {
+		rangeCheck(i);
+		
+		return getSquare(i).getPiece();
+	}
+	
+	public void setPiece(int i, Piece piece) {
+		rangeCheck(i);
+		
+		getSquare(i).setPiece(piece);
 	}
 	
 	public Piece getPiece(Position pos) {
-		Square square = getSquare(pos);
-		return square.getPiece();
+		rangeCheck(pos);
+		
+		return getSquare(pos).getPiece();
 	}
 	
 	public void setPiece(Position pos, Piece piece) {
-		Square square = squares[pos.getRow()][pos.getCol()];
-		square.setPiece(piece);
+		rangeCheck(pos);
+		
+		getSquare(pos).setPiece(piece);
 	}
 	
-	public Square getSquare(Position pos) {
-		return squares[pos.getRow()][pos.getCol()];
+	public boolean isOccupied(int i) {
+		rangeCheck(i);
+		
+		return getSquare(i).isOccupied();
 	}
 	
-	public int getRowSize() {
-		return squares.length;
+	public boolean isOccupied(Position pos) {
+		rangeCheck(pos);
+		
+		return getSquare(pos).isOccupied();
 	}
 	
-	public int getColSize() {
-		return squares[0].length;
+	public int positionToIndex(Position pos) {
+		rangeCheck(pos);
+		
+		return (pos.getRow() * rowCount) + pos.getCol();
 	}
 	
-	public void printPieces() {
-		for (int row = 0; row < getRowSize(); row++) {
-			String space = "";
+	public Position indexToPosition(int i) {
+		rangeCheck(i);
+		
+		return new Position(i / rowCount, i % colCount);
+	}
+	
+	public Board getCopy() {
+		return new Board(this);
+	}
+	
+	public int getRowCount() {
+		return rowCount;
+	}
+	
+	public int getColCount() {
+		return colCount;
+	}
+	
+	public int getSquareCount() {
+		return squareCount;
+	}
+	
+	// Private methods
+	
+	private void initSquares() {
+		boolean isWhite = true;
+		
+		for (int i = 0; i < squareCount; i++) {
+			Square square;
 			
-			for (int col = 0; col < getColSize(); col++) {
-				Square square = squares[row][col];
-				
-				if (square.isOccupied()) {
-					Piece piece = square.getPiece();
-					char abbr = piece.getAbbreviation();
-					
-					if (piece.isWhite()) {
-						abbr = Character.toUpperCase(abbr);
-					}
-					else {
-						abbr = Character.toLowerCase(abbr);
-					}
-					
-					System.out.print(space + abbr);
-				}
-				else {
-					System.out.print(space + " ");
-				}
-				
-				space = " ";
+			if (isWhite) {
+				square = new Square(ChessColor.WHITE);
+			}
+			else {
+				square = new Square(ChessColor.BLACK);
 			}
 			
-			System.out.println();
+			setSquare(i, square);
+			isWhite = !isWhite; // Alternate between white and black squares
+			
+			// New row
+			if (i % rowCount == 0) {
+				isWhite = !isWhite; // First square in row is same color as last square in previous row
+			}
 		}
 	}
 	
-	public void printSquareColors() {
-		for (int row = 0; row < getRowSize(); row++) {
-			String space = "";
-			
-			for (int col = 0; col < getColSize(); col++) {
-				Square square = squares[row][col];
-				
-				if (square.isWhite()) {
-					System.out.print(space + "W");
-				}
-				else {
-					System.out.print(space + "B");
-				}
-				
-				space = " ";
-			}
-			
-			System.out.println();
+	private void setPositionsByColor(ChessColor color, Set<Position> positions) {
+		if (color.isWhite()) {
+			whitePositions = positions;
 		}
+		else {
+			blackPositions = positions;
+		}
+	}
+	
+	private void setKingPositionByColor(ChessColor color, Position pos) {
+		if (color.isWhite()) {
+			whiteKingPosition = pos;
+		}
+		else {
+			blackKingPosition = pos;
+		}
+	}
+	
+	private Square[] getSquares() {
+		return boardSquares;
+	}
+	
+	private void setSquares(Square[] squares) {
+		boardSquares = squares;
+	}
+	
+	private Square getSquare(int i) {
+		rangeCheck(i);
+		
+		return boardSquares[i];
+	}
+
+	private void setSquare(int i, Square square) {
+		rangeCheck(i);
+		
+		boardSquares[i] = square;
+	}
+	
+	private Square getSquare(Position pos) {
+		rangeCheck(pos);
+		
+		return boardSquares[positionToIndex(pos)];
+	}
+	
+	private void setSquare(Position pos, Square square) {
+		rangeCheck(pos);
+		
+		boardSquares[positionToIndex(pos)] = square;
+	}
+	
+	private Square[] copySquares(Square[] squares) {
+		Square[] squaresCopy = new Square[squares.length];
+		
+		for (int i = 0; i < squares.length; i++) {
+			squaresCopy[i] = squares[i].getCopy();
+		}
+		
+		return squaresCopy;
+	}
+	
+	private Set<Position> copyPositions(Set<Position> positions) {
+		Set<Position> positionsCopy = new HashSet<Position>();
+		
+		for (Position pos : positions) {
+			positionsCopy.add(pos);
+		}
+		
+		return positionsCopy;
+	}
+	
+	private void copyBoard(Board board) {
+		// Copy squares
+		setSquares(copySquares(board.getSquares()));
+		
+		// Copy positions
+		setPositionsByColor(ChessColor.WHITE, copyPositions(board.getPositionsByColor(ChessColor.WHITE)));
+		setPositionsByColor(ChessColor.BLACK, copyPositions(board.getPositionsByColor(ChessColor.BLACK)));
+		
+		setKingPositionByColor(ChessColor.WHITE, board.getKingPositionByColor(ChessColor.WHITE));
+		setKingPositionByColor(ChessColor.BLACK, board.getKingPositionByColor(ChessColor.BLACK));
+	}
+	
+	private void rangeCheck(Position pos) {
+		int row = pos.getRow();
+		int col = pos.getCol();
+		
+		if (row < 0 || row > rowCount || col < 0 || col > colCount) {
+			throw new IndexOutOfBoundsException(outOfBoundsMessage(row, col));
+		}
+	}
+	
+	private void rangeCheck(int index) {
+		if (index < 0 || index > squareCount) {
+			throw new IndexOutOfBoundsException(outOfBoundsMessage(index));
+		}
+	}
+	
+	private String outOfBoundsMessage(int row, int col) {
+		return "Row: " + row + ", Column: " + col + ", Rows: " + rowCount + ", Columns: " + colCount;
+	}
+	
+	private String outOfBoundsMessage(int index) {
+		return "Index: " + index + ", Size: " + squareCount;
 	}
 }

@@ -1,17 +1,21 @@
-package com.seanhoapps.chessgame;
+package com.seanhoapps.chessgame.pieces;
+
+import com.seanhoapps.chessgame.ChessColor;
+import com.seanhoapps.chessgame.Position;
 
 public class Knight extends Piece {
 	public Knight(ChessColor color) {
 		super(PieceType.KNIGHT, color);
 	}
 	
+	// Copy constructor
+	public Knight(Knight knight) {
+		super(knight);
+	}
+	
 	// Knight moves in L-shape in any direction
 	@Override
 	public boolean isPossibleMove(Position startPos, Position endPos) {
-		if (endPos.equals(startPos)) {
-			return false;
-		}
-		
 		int rowDiff = Math.abs(endPos.getRow() - startPos.getRow());
 		int colDiff = Math.abs(endPos.getCol() - startPos.getCol());
 		
@@ -22,15 +26,19 @@ public class Knight extends Piece {
 		return false;
 	}
 	
-	// Knight jumps over other pieces
 	@Override
 	public Position[] getMovePath(Position startPos, Position endPos) {
-		return new Position[0];
+		return new Position[0]; // Knight jumps over other pieces
 	}
 	
 	// King is already K
 	@Override
 	public char getAbbreviation() {		
 		return 'N';
+	}
+	
+	@Override
+	public Piece getCopy() {
+		return new Knight(this);
 	}
 }
