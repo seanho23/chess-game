@@ -73,12 +73,8 @@ public class Board {
 		}
 	}
 	
-	public void capturePiece(Position pos) {
+  public void removePiece(Position pos) {
 		rangeCheck(pos);
-		
-		if (!isOccupied(pos)) {
-			return;
-		}
 		
 		ChessColor color = getPiece(pos).getColor();
 		
@@ -119,64 +115,11 @@ public class Board {
 		return getSquare(i).getPiece();
 	}
 	
-	public void setPiece(int i, Piece piece) {
-		rangeCheck(i);
-		
-		getSquare(i).setPiece(piece);
-	}
-	
 	public Piece getPiece(Position pos) {
 		rangeCheck(pos);
 		
 		return getSquare(pos).getPiece();
-	}
-	
-	public void setPiece(Position pos, Piece piece) {
-		rangeCheck(pos);
-		
-		getSquare(pos).setPiece(piece);
-	}
-	
-	public boolean isOccupied(int i) {
-		rangeCheck(i);
-		
-		return getSquare(i).isOccupied();
-	}
-	
-	public boolean isOccupied(Position pos) {
-		rangeCheck(pos);
-		
-		return getSquare(pos).isOccupied();
-	}
-	
-	public int positionToIndex(Position pos) {
-		rangeCheck(pos);
-		
-		return (pos.getRow() * rowCount) + pos.getCol();
-	}
-	
-	public Position indexToPosition(int i) {
-		rangeCheck(i);
-		
-		return new Position(i / rowCount, i % colCount);
-	}
-	
-	public Board getCopy() {
-		return new Board(this);
-	}
-	
-	public int getRowCount() {
-		return rowCount;
-	}
-	
-	public int getColCount() {
-		return colCount;
-	}
-	
-	public int getSquareCount() {
-		return squareCount;
-	}
-	
+    
 	// Private methods
 	
 	private void initSquares() {
@@ -194,7 +137,7 @@ public class Board {
 			
 			setSquare(i, square);
 			isWhite = !isWhite; // Alternate between white and black squares
-			
+      
 			// New row
 			if (i % rowCount == 0) {
 				isWhite = !isWhite; // First square in row is same color as last square in previous row
@@ -292,7 +235,7 @@ public class Board {
 			throw new IndexOutOfBoundsException(outOfBoundsMessage(row, col));
 		}
 	}
-	
+  
 	private void rangeCheck(int index) {
 		if (index < 0 || index > squareCount) {
 			throw new IndexOutOfBoundsException(outOfBoundsMessage(index));

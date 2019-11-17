@@ -18,9 +18,7 @@ public class Pawn extends Piece {
 	@Override
 	public boolean isPossibleMove(Position startPos, Position endPos) {
 		int startRow = startPos.getRow();
-		int startCol = startPos.getCol();
 		int endRow = endPos.getRow();
-		int endCol = endPos.getCol();
 		
 		// Can only move forward
 		if ((isWhite() && endRow > startRow) || (!isWhite() && endRow < startRow)) {
