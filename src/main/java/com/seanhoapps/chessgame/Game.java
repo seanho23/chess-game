@@ -21,7 +21,7 @@ public class Game {
 		initBoard(ROW_COUNT, COL_COUNT);
 	}
 	
-	public boolean doMove(Position startPos, Position endPos) {
+	public boolean move(Position startPos, Position endPos) {
 		if (!isPotentialMove(startPos, endPos)) {
 			return false;
 		}
@@ -36,16 +36,7 @@ public class Game {
 		saveBoardState();
 		
 		// Perform move
-		if (isCastle(startPos, endPos, chessBoard)) {
-			doCastle(startPos, endPos, chessBoard);
-		}
-		else if (isPawnCapture(startPos, endPos, chessBoard)) {
-			doPawnCapture(startPos, endPos, chessBoard);
-		}
-		else {
-			chessBoard.capturePiece(endPos);
-			chessBoard.movePiece(startPos, endPos);
-		}
+		doMove(startPos, endPos, chessBoard);
 		
 		if (isPawnPromotion(startPos, endPos, chessBoard)) {
 			// Do pawn promotion
@@ -64,25 +55,30 @@ public class Game {
 		return true;
 	}
 	
+	public void doMove(Position startPos, Position endPos, Board board) {
+		if (isCastle(startPos, endPos, chessBoard)) {
+			doCastle(startPos, endPos, chessBoard);
+		}
+		else if (isPawnCapture(startPos, endPos, chessBoard)) {
+			doPawnCapture(startPos, endPos, chessBoard);
+		}
+		else {
+			if (chessBoard.isOccupied(endPos)) {
+				chessBoard.removePiece(endPos);
+			}
+			
+			chessBoard.movePiece(startPos, endPos);
+		}
+	}
+	
 	public boolean isLegalMove(Position startPos, Position endPos) {
 		return isLegalMove(startPos, endPos, chessBoard.getCopy());
 	}
 	
 	public boolean isLegalMove(Position startPos, Position endPos, Board board) {
-		// Ensure move does not place own King under attack		
-		if (isCastle(startPos, endPos, board)) {
-			doCastle(startPos, endPos, board);
-		}
-		else if (isPawnCapture(startPos, endPos, board)) {
-			doPawnCapture(startPos, endPos, board);
-		}
-		else {
-			// Do normal move or capture
-			board.capturePiece(endPos);
-			board.movePiece(startPos, endPos);
-		}
-		
 		// Move cannot put own King under attack
+		doMove(startPos, endPos, board);
+		
 		if (isChecked(board.getPiece(startPos).getColor(), board)) {
 			return false;
 		}
@@ -318,10 +314,10 @@ public class Game {
 		if (isEnPassant(startPos, endPos, board)) {
 			int rowOffset = Integer.signum(endPos.getRow() - startPos.getRow());
 			Position enemyPawnPos = new Position(endPos.getRow() - rowOffset, endPos.getCol());
-			board.capturePiece(enemyPawnPos);
+			board.removePiece(enemyPawnPos);
 		}
 		
-		board.capturePiece(endPos);
+		board.removePiece(endPos);
 		board.movePiece(startPos, endPos);
 	}
 	
@@ -373,16 +369,7 @@ public class Game {
 			for (Position teamEndPos : teamEndPositions) {
 				testBoard = chessBoard.getCopy();
 				
-				if (isCastle(teamStartPos, teamEndPos, testBoard)) {
-					doCastle(teamStartPos, teamEndPos, testBoard);
-				}
-				else if (isPawnCapture(teamStartPos, teamEndPos, testBoard)) {
-					doPawnCapture(teamStartPos, teamEndPos, testBoard);
-				}
-				else {
-					testBoard.capturePiece(teamEndPos);
-					testBoard.movePiece(teamStartPos, teamEndPos);
-				}
+				doMove(teamStartPos, teamEndPos, testBoard);
 				
 				// Teammate makes a move
 				// Did teammate block enemy attacking path?

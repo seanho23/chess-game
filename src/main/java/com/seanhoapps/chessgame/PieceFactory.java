@@ -33,9 +33,9 @@ public class PieceFactory {
 				piece = new Pawn(color);
 				break;
 			default:
-				throw new AssertionError(type); // Should never happen
+				throw new IllegalArgumentException("Invalid PieceType"); // This should never happen
 		}
-		
+
 		return piece;
 	}
 }

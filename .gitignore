@@ -1,5 +1,5 @@
-# Created by https://www.gitignore.io/api/java,macos,gradle,eclipse
-# Edit at https://www.gitignore.io/?templates=java,macos,gradle,eclipse
+# Created by https://www.gitignore.io/api/java,macos,gradle,eclipse,maven
+# Edit at https://www.gitignore.io/?templates=java,macos,gradle,eclipse,maven
 
 ### Eclipse ###
 .metadata
@@ -123,6 +123,19 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+.flattened-pom.xml
+
 ### Gradle ###
 .gradle
 build/
@@ -142,4 +155,4 @@ gradle-app.setting
 ### Gradle Patch ###
 **/build/
 
-# End of https://www.gitignore.io/api/java,macos,gradle,eclipse
+# End of https://www.gitignore.io/api/java,macos,gradle,eclipse,maven

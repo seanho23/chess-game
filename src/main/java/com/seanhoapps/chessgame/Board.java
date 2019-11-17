@@ -73,12 +73,8 @@ public class Board {
 		}
 	}
 	
-	public void capturePiece(Position pos) {
+	public void removePiece(Position pos) {
 		rangeCheck(pos);
-		
-		if (!isOccupied(pos)) {
-			return;
-		}
 		
 		ChessColor color = getPiece(pos).getColor();
 		
@@ -119,16 +115,16 @@ public class Board {
 		return getSquare(i).getPiece();
 	}
 	
-	public void setPiece(int i, Piece piece) {
-		rangeCheck(i);
-		
-		getSquare(i).setPiece(piece);
-	}
-	
 	public Piece getPiece(Position pos) {
 		rangeCheck(pos);
 		
 		return getSquare(pos).getPiece();
+	}
+	
+	public void setPiece(int i, Piece piece) {
+		rangeCheck(i);
+		
+		getSquare(i).setPiece(piece);
 	}
 	
 	public void setPiece(Position pos, Piece piece) {
