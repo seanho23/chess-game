@@ -9,7 +9,7 @@ public abstract class Piece {
 	
 	// Only used by hashCode() for comparisons
 	protected final int id;
-	
+
 	protected PieceType type;
 	protected ChessColor color;
 	protected boolean hasMoved = false;
@@ -67,7 +67,7 @@ public abstract class Piece {
 	public boolean hasMoved() {
 		return hasMoved;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
@@ -117,7 +117,7 @@ public abstract class Piece {
 	public String toString() {
 		return type.toString();
 	}
-	
+
 	private int getId() {
 		return id;
 	}
