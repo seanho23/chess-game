@@ -19,8 +19,8 @@ public class Board {
 	public Board(int rowCount, int colCount) {
 		this.rowCount = rowCount;
 		this.colCount = colCount;
-		this.squareCount = this.rowCount * this.colCount;
-		boardSquares = new Square[getSquareCount()];
+		squareCount = this.rowCount * this.colCount;
+		boardSquares = new Square[squareCount];
 		initSquares();
 	}
 	
@@ -119,6 +119,59 @@ public class Board {
 		rangeCheck(pos);
 		
 		return getSquare(pos).getPiece();
+	}
+	
+	public void setPiece(int i, Piece piece) {
+		rangeCheck(i);
+		
+		getSquare(i).setPiece(piece);
+	}
+	
+	public void setPiece(Position pos, Piece piece) {
+		rangeCheck(pos);
+		
+		getSquare(pos).setPiece(piece);
+	}
+	
+	public boolean isOccupied(int i) {
+		rangeCheck(i);
+		
+		return getSquare(i).isOccupied();
+	}
+	
+	public boolean isOccupied(Position pos) {
+		rangeCheck(pos);
+		
+		return getSquare(pos).isOccupied();
+	}
+	
+	public int positionToIndex(Position pos) {
+		rangeCheck(pos);
+		
+		return pos.getRow() * rowCount + pos.getCol();
+	}
+	
+	public Position indexToPosition(int i) {
+		rangeCheck(i);
+		
+		return new Position(i / rowCount, i % colCount);
+	}
+	
+	public int getRowCount() {
+		return rowCount;
+	}
+	
+	public int getColCount() {
+		return colCount;
+	}
+	
+	public int getSquareCount() {
+		return squareCount;
+	}
+	
+	public Board getCopy() {
+		return new Board(this);
+	}
     
 	// Private methods
 	
