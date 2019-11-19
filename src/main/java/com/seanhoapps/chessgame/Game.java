@@ -388,25 +388,26 @@ public class Game {
 	}
 	
 	public Set<Position> getPseudoLegalMoves(Position startPos) {
+		Piece piece = chessBoard.getPiece(startPos);
 		Set<Position> endPositions = new HashSet<Position>();
 		
-		for (int i = 0, squareCount = chessBoard.getSquareCount(); i < squareCount; i++) {
-			Position endPos = chessBoard.indexToPosition(i);
-			
-			if (endPos.equals(startPos)) {
-				continue;
-			}
-			
-			// Piece cannot move to square occupied by teammate
-			Piece piece = chessBoard.getPiece(startPos);
-			
-			if (chessBoard.isOccupied(endPos) && chessBoard.getPiece(endPos).isSameColor(piece)) {
-				continue;
-			}
-			
-			// Piece-specific movement conditions must be satisfied
-			if (isNormalMove(startPos, endPos, chessBoard) || isSpecialMove(startPos, endPos, chessBoard)) {
-				endPositions.add(endPos);
+		for (int row = 0, rows = chessBoard.getRowCount(); row < rows; row++) {
+			for (int col = 0, cols = chessBoard.getColCount(); col < cols; col++) {
+				Position endPos = new Position(row, col);
+				
+				if (endPos.equals(startPos)) {
+					continue;
+				}
+				
+				// Piece cannot move to square occupied by teammate				
+				if (chessBoard.isOccupied(endPos) && chessBoard.getPiece(endPos).isSameColor(piece)) {
+					continue;
+				}
+				
+				// Piece-specific movement conditions must be satisfied
+				if (isNormalMove(startPos, endPos, chessBoard) || isSpecialMove(startPos, endPos, chessBoard)) {
+					endPositions.add(endPos);
+				}
 			}
 		}
 		
@@ -447,6 +448,10 @@ public class Game {
 	
 	public ChessColor getTurnColor() {
 		return (totalMoves % 2 == 0) ? ChessColor.WHITE : ChessColor.BLACK;
+	}
+	
+	public Board getBoard() {
+		return chessBoard;
 	}
 	
 	/*
