@@ -6,30 +6,20 @@ import java.util.Set;
 import com.seanhoapps.chessgame.pieces.Piece;
 
 public class Board {
-	private final int rowCount;
-	private final int colCount;
-	private final int squareCount;
-	
-	private Square[] boardSquares;
+	private Square[][] boardSquares;
 	private Set<Position> whitePositions = new HashSet<Position>();
 	private Set<Position> blackPositions = new HashSet<Position>();
 	private Position whiteKingPosition;
 	private Position blackKingPosition;
 	
 	public Board(int rowCount, int colCount) {
-		this.rowCount = rowCount;
-		this.colCount = colCount;
-		squareCount = this.rowCount * this.colCount;
-		boardSquares = new Square[squareCount];
+		boardSquares = new Square[rowCount][colCount];
 		initSquares();
 	}
 	
 	// Copy constructor
 	private Board(Board board) {
-		rowCount = board.getRowCount();
-		colCount = board.getColCount();
-		squareCount = board.getSquareCount();
-		boardSquares = new Square[squareCount];
+		boardSquares = new Square[board.getRowCount()][board.getColCount()];
 		copyBoard(board);
 	}
 	
@@ -97,8 +87,10 @@ public class Board {
 	}
 	
 	public boolean isValidPosition(Position pos) {
-		int i = positionToIndex(pos);
-		return i >= 0 && i < getSquareCount();
+		int row = pos.getRow();
+		int col = pos.getCol();
+		
+		return row >= 0 && row < getRowCount() && col >= 0 && col < getColCount();
 	}
 	
 	public Set<Position> getPositionsByColor(ChessColor color) {
@@ -109,22 +101,10 @@ public class Board {
 		return (color.isWhite()) ? whiteKingPosition : blackKingPosition;
 	}
 	
-	public Piece getPiece(int i) {
-		rangeCheck(i);
-		
-		return getSquare(i).getPiece();
-	}
-	
 	public Piece getPiece(Position pos) {
 		rangeCheck(pos);
 		
 		return getSquare(pos).getPiece();
-	}
-	
-	public void setPiece(int i, Piece piece) {
-		rangeCheck(i);
-		
-		getSquare(i).setPiece(piece);
 	}
 	
 	public void setPiece(Position pos, Piece piece) {
@@ -133,40 +113,22 @@ public class Board {
 		getSquare(pos).setPiece(piece);
 	}
 	
-	public boolean isOccupied(int i) {
-		rangeCheck(i);
-		
-		return getSquare(i).isOccupied();
-	}
-	
 	public boolean isOccupied(Position pos) {
 		rangeCheck(pos);
 		
 		return getSquare(pos).isOccupied();
 	}
 	
-	public int positionToIndex(Position pos) {
-		rangeCheck(pos);
-		
-		return pos.getRow() * rowCount + pos.getCol();
-	}
-	
-	public Position indexToPosition(int i) {
-		rangeCheck(i);
-		
-		return new Position(i / rowCount, i % colCount);
+	public Square[][] getSquares() {
+		return boardSquares;
 	}
 	
 	public int getRowCount() {
-		return rowCount;
+		return boardSquares.length;
 	}
 	
 	public int getColCount() {
-		return colCount;
-	}
-	
-	public int getSquareCount() {
-		return squareCount;
+		return boardSquares[0].length;
 	}
 	
 	public Board getCopy() {
@@ -176,24 +138,18 @@ public class Board {
 	// Private methods
 	
 	private void initSquares() {
-		boolean isWhite = true;
-		
-		for (int i = 0; i < squareCount; i++) {
-			Square square;
-			
-			if (isWhite) {
-				square = new Square(ChessColor.WHITE);
-			}
-			else {
-				square = new Square(ChessColor.BLACK);
-			}
-			
-			setSquare(i, square);
-			isWhite = !isWhite; // Alternate between white and black squares
-      
-			// New row
-			if (i % rowCount == 0) {
-				isWhite = !isWhite; // First square in row is same color as last square in previous row
+		for (int row = 0, rows = getRowCount(); row < rows; row++) {
+			for (int col = 0, cols = getColCount(); col < cols; col++) {
+				Square square;
+				
+				if ((row + col) % 2 == 0) {
+					square = new Square(ChessColor.WHITE);
+				}
+				else {
+					square = new Square(ChessColor.BLACK);
+				}
+				
+				setSquare(new Position(row, col), square);
 			}
 		}
 	}
@@ -216,43 +172,31 @@ public class Board {
 		}
 	}
 	
-	private Square[] getSquares() {
-		return boardSquares;
-	}
-	
-	private void setSquares(Square[] squares) {
+	private void setSquares(Square[][] squares) {
 		boardSquares = squares;
-	}
-	
-	private Square getSquare(int i) {
-		rangeCheck(i);
-		
-		return boardSquares[i];
-	}
-
-	private void setSquare(int i, Square square) {
-		rangeCheck(i);
-		
-		boardSquares[i] = square;
 	}
 	
 	private Square getSquare(Position pos) {
 		rangeCheck(pos);
 		
-		return boardSquares[positionToIndex(pos)];
+		return boardSquares[pos.getRow()][pos.getCol()];
 	}
 	
 	private void setSquare(Position pos, Square square) {
 		rangeCheck(pos);
 		
-		boardSquares[positionToIndex(pos)] = square;
+		boardSquares[pos.getRow()][pos.getCol()] = square;
 	}
 	
-	private Square[] copySquares(Square[] squares) {
-		Square[] squaresCopy = new Square[squares.length];
+	private Square[][] copySquares(Square[][] squares) {
+		int rows = squares.length;
+		int cols = squares[0].length;
+		Square[][] squaresCopy = new Square[rows][cols];
 		
-		for (int i = 0; i < squares.length; i++) {
-			squaresCopy[i] = squares[i].getCopy();
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				squaresCopy[row][col] = squares[row][col].getCopy();
+			}
 		}
 		
 		return squaresCopy;
@@ -284,22 +228,12 @@ public class Board {
 		int row = pos.getRow();
 		int col = pos.getCol();
 		
-		if (row < 0 || row > rowCount || col < 0 || col > colCount) {
+		if (row < 0 || row > getRowCount() || col < 0 || col > getColCount()) {
 			throw new IndexOutOfBoundsException(outOfBoundsMessage(row, col));
-		}
-	}
-  
-	private void rangeCheck(int index) {
-		if (index < 0 || index > squareCount) {
-			throw new IndexOutOfBoundsException(outOfBoundsMessage(index));
 		}
 	}
 	
 	private String outOfBoundsMessage(int row, int col) {
-		return "Row: " + row + ", Column: " + col + ", Rows: " + rowCount + ", Columns: " + colCount;
-	}
-	
-	private String outOfBoundsMessage(int index) {
-		return "Index: " + index + ", Size: " + squareCount;
+		return "Row: " + row + ", Column: " + col + ", Rows: " + getRowCount() + ", Columns: " + getColCount();
 	}
 }
