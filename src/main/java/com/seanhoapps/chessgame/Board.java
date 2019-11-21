@@ -119,6 +119,18 @@ public class Board {
 		return getSquare(pos).isOccupied();
 	}
 	
+	public Square getSquare(int row, int col) {
+		rangeCheck(row, col);
+		
+		return boardSquares[row][col];
+	}
+	
+	public Square getSquare(Position pos) {
+		rangeCheck(pos);
+		
+		return boardSquares[pos.getRow()][pos.getCol()];
+	}
+	
 	public Square[][] getSquares() {
 		return boardSquares;
 	}
@@ -176,12 +188,6 @@ public class Board {
 		boardSquares = squares;
 	}
 	
-	private Square getSquare(Position pos) {
-		rangeCheck(pos);
-		
-		return boardSquares[pos.getRow()][pos.getCol()];
-	}
-	
 	private void setSquare(Position pos, Square square) {
 		rangeCheck(pos);
 		
@@ -222,6 +228,12 @@ public class Board {
 		
 		setKingPositionByColor(ChessColor.WHITE, board.getKingPositionByColor(ChessColor.WHITE));
 		setKingPositionByColor(ChessColor.BLACK, board.getKingPositionByColor(ChessColor.BLACK));
+	}
+	
+	private void rangeCheck(int row, int col) {
+		if (row < 0 || row > getRowCount() || col < 0 || col > getColCount()) {
+			throw new IndexOutOfBoundsException(outOfBoundsMessage(row, col));
+		}
 	}
 	
 	private void rangeCheck(Position pos) {

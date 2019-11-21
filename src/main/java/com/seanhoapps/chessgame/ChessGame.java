@@ -1,7 +1,9 @@
 package com.seanhoapps.chessgame;
 
+import com.seanhoapps.chessgame.gui.GameGUI;
+
 public class ChessGame {
 	public static void main(String[] args) {
-		new Game();
+		new GameGUI(new Game());
 	}
 }
