@@ -1,5 +1,7 @@
 package com.seanhoapps.chessgame.pieces;
 
+import javax.swing.ImageIcon;
+
 import com.seanhoapps.chessgame.ChessColor;
 import com.seanhoapps.chessgame.Position;
 
@@ -13,12 +15,12 @@ public abstract class Piece {
 	protected PieceType type;
 	protected ChessColor color;
 	protected boolean hasMoved = false;
+	protected ImageIcon icon;
 	
 	public Piece(PieceType type, ChessColor color) {
 		id = count;
 		this.type = type;
 		this.color = color;
-		
 		count++;
 	}
 	
@@ -66,6 +68,14 @@ public abstract class Piece {
 	
 	public boolean hasMoved() {
 		return hasMoved;
+	}
+	
+	public ImageIcon getIcon() {
+		return icon;
+	}
+	
+	public void setIcon(ImageIcon icon) {
+		this.icon = icon;
 	}
 
 	@Override

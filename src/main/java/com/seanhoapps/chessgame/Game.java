@@ -23,10 +23,12 @@ public class Game {
 	
 	public boolean move(Position startPos, Position endPos) {
 		if (!isPotentialMove(startPos, endPos)) {
+			System.out.println("Not potential move");
 			return false;
 		}
 		
 		if (!isLegalMove(startPos, endPos)) {
+			System.out.println("Not legal move");
 			return false;
 		}
 		
@@ -52,6 +54,7 @@ public class Game {
 		}
 		
 		totalMoves++;
+		System.out.println(getTurnColor());
 		return true;
 	}
 	
@@ -89,16 +92,19 @@ public class Game {
 	public boolean isPotentialMove(Position startPos, Position endPos) {
 		// Cannot move in place
 		if (endPos.equals(startPos)) {
+			System.out.println("Same position");
 			return false;
 		}
 		
 		// Positions must be within bounds of board
 		if (!chessBoard.isValidPosition(startPos) || !chessBoard.isValidPosition(endPos)) {
+			System.out.println("Out of bounds");
 			return false;
 		}
 		
 		// Cannot move an empty square
 		if (!chessBoard.isOccupied(startPos)) {
+			System.out.println("Empty position");
 			return false;
 		}
 		
@@ -106,16 +112,19 @@ public class Game {
 		Piece piece = chessBoard.getPiece(startPos);
 
 		if (!piece.isSameColor(getTurnColor())) {
+			System.out.println("Cannot move enemy piece");
 			return false;
 		}
 		
 		// Cannot capture own pieces
 		if (chessBoard.isOccupied(endPos) && chessBoard.getPiece(endPos).isSameColor(piece)) {
+			System.out.println("Cannot capture own piece");
 			return false;
 		}
 		
 		// Move must satisfy piece-specific movement conditions
 		if (!isNormalMove(startPos, endPos, chessBoard) || !isSpecialMove(startPos, endPos, chessBoard)) {
+			System.out.println("Fail move check");
 			return false;
 		}
 
@@ -126,11 +135,13 @@ public class Game {
 		Piece piece = board.getPiece(startPos);
 		
 		if (!piece.isPossibleMove(startPos, endPos)) {
+			System.out.println("Not possible move");
 			return false;
 		}
 		
 		// Piece cannot move through other pieces
 		if (!board.isMovePathClear(piece.getMovePath(startPos, endPos))) {
+			System.out.println("Not clear path");
 			return false;
 		}
 		
@@ -211,11 +222,13 @@ public class Game {
 		Piece piece = board.getPiece(startPos);
 		
 		if (!piece.getType().isPawn()) {
+			System.out.println("Not pawn");
 			return false;
 		}
 		
 		// Can only move forward
 		if ((piece.isWhite() && endPos.getRow() > startPos.getRow()) || (!piece.isWhite() && endPos.getRow() < startPos.getRow())) {
+			System.out.println("Can only move forward");
 			return false;
 		}
 		
@@ -224,11 +237,13 @@ public class Game {
 		int colDiff = endPos.getCol() - startPos.getCol();
 		
 		if (Math.abs(rowDiff) != 1 && Math.abs(colDiff) != 1) {
+			System.out.println("Cannot capture forward");
 			return false;
 		}
 		
 		if (!board.isOccupied(endPos)) {
 			if (!isEnPassant(startPos, endPos, board)) {
+				System.out.println("Not enpassant");
 				return false;
 			}
 		}
@@ -237,6 +252,7 @@ public class Game {
 		Piece targetPiece = board.getPiece(endPos);
 		
 		if (targetPiece.isSameColor(piece)) {
+			System.out.println("Cannot capture teammate");
 			return false;
 		}
 		
@@ -256,6 +272,10 @@ public class Game {
 		}
 		
 		// Enemy pawn has to have moved the previous turn
+		if (isHistoryEmpty()) {
+			return false;
+		}
+		
 		Board lastBoard = getLastBoardState();
 		int rowOffset = Integer.signum(endPos.getRow() - startPos.getRow());
 		Position enemyStartPos = new Position(endPos.getRow() + rowOffset, endPos.getCol());
