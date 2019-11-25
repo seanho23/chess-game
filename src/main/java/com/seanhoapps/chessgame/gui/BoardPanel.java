@@ -52,5 +52,5 @@ public class BoardPanel extends JPanel {
 		pieceLayer = new PieceLayerPanel(board);
 		pieceLayer.setSize(BOARD_SIZE);
 		layers.add(pieceLayer, JLayeredPane.DRAG_LAYER, 0);
-	}
+  }
 }
