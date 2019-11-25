@@ -42,4 +42,9 @@ public class Position {
 		hash = 31 * hash + col;
 		return hash;
 	}
+	
+	@Override
+	public String toString() {
+		return "(" + row + ", " + col + ")";
+	}
 }

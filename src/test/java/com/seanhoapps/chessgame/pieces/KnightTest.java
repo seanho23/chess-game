@@ -30,70 +30,70 @@ public class KnightTest {
 	public void isPossibleMove_moveUpLeftLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 1);
-		assertTrue(knight.isPossibleMove(startPos, endPos));
+		assertTrue(knight.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveUpUpLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(2, 2);
-		assertTrue(knight.isPossibleMove(startPos, endPos));
+		assertTrue(knight.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveUpUpRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(2, 4);
-		assertTrue(knight.isPossibleMove(startPos, endPos));
+		assertTrue(knight.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveUpRightRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 5);
-		assertTrue(knight.isPossibleMove(startPos, endPos));
+		assertTrue(knight.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDownRightRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(5, 5);
-		assertTrue(knight.isPossibleMove(startPos, endPos));
+		assertTrue(knight.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDownDownRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(6, 4);
-		assertTrue(knight.isPossibleMove(startPos, endPos));
+		assertTrue(knight.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDownDownLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(6, 2);
-		assertTrue(knight.isPossibleMove(startPos, endPos));
+		assertTrue(knight.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDownLeftLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(5, 1);
-		assertTrue(knight.isPossibleMove(startPos, endPos));
+		assertTrue(knight.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveUpOneSquare_returnFalse() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 3);
-		assertFalse(knight.isPossibleMove(startPos, endPos));
+		assertFalse(knight.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_illegalMove_returnFalse() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(1, 6);
-		assertFalse(knight.isPossibleMove(startPos, endPos));
+		assertFalse(knight.canMove(startPos, endPos));
 	}
 	
 	/*

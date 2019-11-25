@@ -21,143 +21,108 @@ public class Game {
 		initBoard(ROW_COUNT, COL_COUNT);
 	}
 	
-	public boolean move(Position startPos, Position endPos) {
-		if (!isPotentialMove(startPos, endPos)) {
-			System.out.println("Not potential move");
-			return false;
-		}
-		
-		if (!isLegalMove(startPos, endPos)) {
-			System.out.println("Not legal move");
-			return false;
-		}
-		
-		// Passes all checks
-		
-		// Save current board for undo later
-		saveBoardState();
-		
-		// Perform move
-		doMove(startPos, endPos, chessBoard);
-		
-		if (isPawnPromotion(startPos, endPos, chessBoard)) {
-			// Do pawn promotion
-			// Request user for piece
-		}
-		
-		// TODO: Check for stalemate
-		
-		// End game if move checkmated enemy
-		if (isGameOver()) {
-			// TODO: Implement game over
-			// Manage score
-		}
-		
-		totalMoves++;
-		System.out.println(getTurnColor());
-		return true;
-	}
-	
-	public void doMove(Position startPos, Position endPos, Board board) {
-		if (isCastle(startPos, endPos, chessBoard)) {
-			doCastle(startPos, endPos, chessBoard);
-		}
-		else if (isPawnCapture(startPos, endPos, chessBoard)) {
-			doPawnCapture(startPos, endPos, chessBoard);
-		}
-		else {
-			if (chessBoard.isOccupied(endPos)) {
-				chessBoard.removePiece(endPos);
-			}
-			
-			chessBoard.movePiece(startPos, endPos);
-		}
-	}
-	
-	public boolean isLegalMove(Position startPos, Position endPos) {
-		return isLegalMove(startPos, endPos, chessBoard.getCopy());
-	}
-	
-	public boolean isLegalMove(Position startPos, Position endPos, Board board) {
-		// Move cannot put own King under attack
-		doMove(startPos, endPos, board);
-		
-		if (isChecked(board.getPiece(startPos).getColor(), board)) {
-			return false;
-		}
-		
-		return true;
-	}
-	
-	public boolean isPotentialMove(Position startPos, Position endPos) {
+	private void validateInput(Position startPosition, Position endPosition) {
 		// Cannot move in place
-		if (endPos.equals(startPos)) {
-			System.out.println("Same position");
-			return false;
+		if (endPosition.equals(startPosition)) {
+			throw new IllegalArgumentException();
 		}
 		
-		// Positions must be within bounds of board
-		if (!chessBoard.isValidPosition(startPos) || !chessBoard.isValidPosition(endPos)) {
-			System.out.println("Out of bounds");
-			return false;
+		// Cannot move out of bounds
+		if (!chessBoard.isValidPosition(startPosition) || !chessBoard.isValidPosition(endPosition)) {
+			throw new IllegalArgumentException();
 		}
 		
 		// Cannot move an empty square
-		if (!chessBoard.isOccupied(startPos)) {
-			System.out.println("Empty position");
-			return false;
+		if (!chessBoard.isOccupied(startPosition)) {
+			throw new IllegalArgumentException();
 		}
 		
-		// Cannot move enemy pieces
-		Piece piece = chessBoard.getPiece(startPos);
-
+		// Cannot move enemy piece
+		Piece piece = chessBoard.getPiece(startPosition);
 		if (!piece.isSameColor(getTurnColor())) {
-			System.out.println("Cannot move enemy piece");
+			throw new IllegalArgumentException();
+		}
+		
+		// Cannot capture own piece
+		if (chessBoard.isOccupied(endPosition) && chessBoard.getPiece(endPosition).isSameColor(piece)) {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	private void validateMove(Position startPosition, Position endPosition, Board board) throws IllegalMoveException {
+		if (!isNormalMove(startPosition, endPosition, board) && !isSpecialMove(startPosition, endPosition, board)) {
+			throw new IllegalMoveException();
+		}
+		
+//		if (!isLegalMove(startPosition, endPosition, board)) {
+//			throw new IllegalMoveException();
+//		}
+	}
+	
+	public void move(Position startPosition, Position endPosition) throws IllegalMoveException {
+		validateInput(startPosition, endPosition);
+		validateMove(startPosition, endPosition, chessBoard);
+		
+		// Move passes all validation
+		
+		// Perform move
+		doMove(startPosition, endPosition, chessBoard);
+		
+		saveBoardState();
+						
+		totalMoves++;
+	}
+	
+	private void doMove(Position startPosition, Position endPosition, Board board) {
+		if (isCastle(startPosition, endPosition, board)) {
+			doCastle(startPosition, endPosition, board);
+		}
+		else if (isPawnCapture(startPosition, endPosition, board)) {
+			doPawnCapture(startPosition, endPosition, board);
+		}
+		else {
+			// Do normal move
+			board.removePiece(endPosition);
+			board.movePiece(startPosition, endPosition);
+		}
+	}
+	
+	private boolean isLegalMove(Position startPosition, Position endPosition, Board board) {
+		Board testBoard = board.getCopy();
+		
+		doMove(startPosition, endPosition, testBoard);
+		
+		if (isChecked(board.getPiece(startPosition).getColor(), testBoard)) {
 			return false;
 		}
 		
-		// Cannot capture own pieces
-		if (chessBoard.isOccupied(endPos) && chessBoard.getPiece(endPos).isSameColor(piece)) {
-			System.out.println("Cannot capture own piece");
-			return false;
-		}
-		
-		// Move must satisfy piece-specific movement conditions
-		if (!isNormalMove(startPos, endPos, chessBoard) || !isSpecialMove(startPos, endPos, chessBoard)) {
-			System.out.println("Fail move check");
-			return false;
-		}
-
 		return true;
 	}
 	
-	public boolean isNormalMove(Position startPos, Position endPos, Board board) {
-		Piece piece = board.getPiece(startPos);
-		
-		if (!piece.isPossibleMove(startPos, endPos)) {
-			System.out.println("Not possible move");
+	private boolean isNormalMove(Position startPosition, Position endPosition, Board board) {
+		// Move must follow piece-specific movement strategy
+		Piece pieceToMove = board.getPiece(startPosition);
+		if (!pieceToMove.canMove(startPosition, endPosition)) {
 			return false;
 		}
 		
-		// Piece cannot move through other pieces
-		if (!board.isMovePathClear(piece.getMovePath(startPos, endPos))) {
-			System.out.println("Not clear path");
+		// Move path cannot be obstructed
+		if (!board.isMovePathClear(pieceToMove.getMovePath(startPosition, endPosition))) {
 			return false;
 		}
 		
 		return true;
 	}
 	
-	public boolean isSpecialMove(Position startPos, Position endPos, Board board) {
-		Piece piece = board.getPiece(startPos);
-		
-		switch (piece.getType()) {
+	private boolean isSpecialMove(Position startPosition, Position endPosition, Board board) {
+		Piece pieceToMove = board.getPiece(startPosition);
+		switch (pieceToMove.getType()) {
 			case KING:
-				if (isCastle(startPos, endPos, board)) {
+				if (isCastle(startPosition, endPosition, board)) {
 					return true;
 				}
 			case PAWN:
-				if (isPawnCapture(startPos, endPos, board)) {
+				if (isPawnCapture(startPosition, endPosition, board)) {
 					return true;
 				}
 			default:
@@ -165,146 +130,135 @@ public class Game {
 		}
 	}
 	
-	public boolean isCastle(Position startPos, Position endPos, Board board) {
-		// King castling conditions
-		Piece piece = board.getPiece(startPos);
-		
-		if (!piece.getType().isKing()) {
+	private boolean isCastle(Position startPosition, Position endPosition, Board board) {
+		Piece king = board.getPiece(startPosition);
+		if (!king.getType().isKing()) {
 			return false;
 		}
 		
-		int colDiff = endPos.getCol() - startPos.getCol();
-		
-		if (piece.hasMoved() || Math.abs(colDiff) != 2) {
+		// King castling conditions
+		int colDiff = endPosition.getCol() - startPosition.getCol();
+		if (king.hasMoved() || Math.abs(colDiff) != 2) {
 			return false;
 		}
 		
 		// King cannot be in check
-		ChessColor enemyColor = getEnemyColor(piece.getColor());
-		
-		if (isPositionAttackedByColor(startPos, enemyColor, board)) {
+		ChessColor enemyColor = getEnemyColor(king.getColor());
+		if (isPositionAttackedByColor(startPosition, enemyColor, board)) {
 			return false;
 		}
 		
 		// King cannot castle into check
-		if (isPositionAttackedByColor(endPos, enemyColor, board)) {
+		if (isPositionAttackedByColor(endPosition, enemyColor, board)) {
 			return false;
 		}
 		
 		// King cannot castle through check		
-		if (isPositionAttackedByColor(piece.getMovePath(startPos, endPos)[0], enemyColor, board)) {
+		if (isPositionAttackedByColor(king.getMovePath(startPosition, endPosition)[0], enemyColor, board)) {
+			return false;
+		}
+		
+		int rookCol = (Integer.signum(colDiff) > 0) ? board.getColCount() - 1 : 0;
+		Position rookPosition = new Position(startPosition.getRow(), rookCol);
+		if (!board.isOccupied(rookPosition)) {
 			return false;
 		}
 		
 		// Rook castling conditions
-		int rookCol = (Integer.signum(colDiff) > 0) ? board.getColCount() - 1 : 0;
-		Position rookPos = new Position(startPos.getRow(), rookCol);
-		
-		if (!board.isOccupied(rookPos)) {
+		Piece rook = board.getPiece(rookPosition);
+		if (!rook.getType().isRook() || rook.hasMoved() || rook.isSameColor(king)) {
 			return false;
 		}
 		
-		Piece rook = board.getPiece(rookPos);
-		
-		if (!rook.getType().isRook() || !rook.isSameColor(piece) || rook.hasMoved()) {
-			return false;
-		}
-		
-		// Path between King and Rook must be clear
-		if (!board.isMovePathClear(rook.getMovePath(rookPos, startPos))) {
+		// Move path between King and Rook cannot be obstructed
+		if (!board.isMovePathClear(rook.getMovePath(rookPosition, startPosition))) {
 			return false;
 		}
 		
 		return true;
 	}
 	
-	public boolean isPawnCapture(Position startPos, Position endPos, Board board) {
-		Piece piece = board.getPiece(startPos);
-		
-		if (!piece.getType().isPawn()) {
-			System.out.println("Not pawn");
+	private boolean isPawnCapture(Position startPosition, Position endPosition, Board board) {
+		Piece pawn = board.getPiece(startPosition);
+		if (!pawn.getType().isPawn()) {
 			return false;
 		}
 		
-		// Can only move forward
-		if ((piece.isWhite() && endPos.getRow() > startPos.getRow()) || (!piece.isWhite() && endPos.getRow() < startPos.getRow())) {
-			System.out.println("Can only move forward");
-			return false;
-		}
-		
-		// Can only capture diagonally
-		int rowDiff = endPos.getRow() - startPos.getRow();
-		int colDiff = endPos.getCol() - startPos.getCol();
-		
-		if (Math.abs(rowDiff) != 1 && Math.abs(colDiff) != 1) {
-			System.out.println("Cannot capture forward");
-			return false;
-		}
-		
-		if (!board.isOccupied(endPos)) {
-			if (!isEnPassant(startPos, endPos, board)) {
-				System.out.println("Not enpassant");
+		// Pawn can only move forward
+		// White pawn
+		if (pawn.isWhite()) {
+			if (endPosition.getRow() > startPosition.getRow()) {
 				return false;
 			}
 		}
 		
-		// Cannot capture teammate
-		Piece targetPiece = board.getPiece(endPos);
+		// Black pawn
+		if (!pawn.isWhite()) {
+			if (endPosition.getRow() < startPosition.getRow()) {
+				return false;
+			}
+		}
 		
-		if (targetPiece.isSameColor(piece)) {
-			System.out.println("Cannot capture teammate");
+		// Can only capture diagonally
+		int rowDiff = Math.abs(endPosition.getRow() - startPosition.getRow());
+		int colDiff = Math.abs(endPosition.getCol() - startPosition.getCol());
+		if (rowDiff != 1 || colDiff != 1) {
 			return false;
+		}
+		
+		// If no piece currently available for capture, check if piece can be captured in passing (en passant)
+		if (!board.isOccupied(endPosition)) {
+			if (!isEnPassantCapture(startPosition, endPosition, board)) {
+				return false;
+			}
 		}
 		
 		return true;
 	}
 	
-	public boolean isEnPassant(Position startPos, Position endPos, Board board) {
-		// Not en passant if there is any piece diagonally forward
-		if (board.isOccupied(endPos)) {
+	private boolean isEnPassantCapture(Position startPosition, Position endPosition, Board board) {
+		Piece pawn = board.getPiece(startPosition);
+		
+		int fifthRow = pawn.isWhite() ? board.getRowCount() - 5 : 4;
+		
+		if (startPosition.getRow() != fifthRow) {
 			return false;
 		}
 		
-		Piece piece = board.getPiece(startPos);
-		
-		if (!piece.getType().isPawn()) {
+		if (!pawn.getType().isPawn()) {
 			return false;
 		}
 		
-		// Enemy pawn has to have moved the previous turn
-		if (isHistoryEmpty()) {
+		int colOffset = Integer.signum(endPosition.getCol() - startPosition.getCol());
+		Position enemyPawnPosition = new Position(startPosition.getRow(), startPosition.getCol() + colOffset);
+		if (board.isOccupied(endPosition) || !board.isOccupied(enemyPawnPosition)) {
 			return false;
 		}
 		
-		Board lastBoard = getLastBoardState();
-		int rowOffset = Integer.signum(endPos.getRow() - startPos.getRow());
-		Position enemyStartPos = new Position(endPos.getRow() + rowOffset, endPos.getCol());
-		Position enemyEndPos = new Position(endPos.getRow() - rowOffset, endPos.getCol());
-		
-		if (!lastBoard.isOccupied(enemyStartPos) || lastBoard.isOccupied(enemyEndPos)) {
+		Piece enemyPawn = board.getPiece(enemyPawnPosition);
+		if (!enemyPawn.getType().isPawn() || enemyPawn.isSameColor(pawn)) {
 			return false;
 		}
 		
-		Piece enemyPieceStart = lastBoard.getPiece(enemyStartPos);
-		
-		if (!enemyPieceStart.getType().isPawn() || enemyPieceStart.isSameColor(piece) || enemyPieceStart.hasMoved()) {
+		if (!hasTurnHistory()) {
 			return false;
 		}
 		
-		// Enemy pawn has to have moved 2 squares
-		if (!board.isOccupied(enemyEndPos) || board.isOccupied(enemyStartPos)) {
+		int enemyPawnStartRow = enemyPawn.isWhite() ? board.getRowCount() - 2 : 1;
+		Position enemyPawnLastPosition = new Position(enemyPawnStartRow, endPosition.getCol());
+		Board enemyBoardState = getLastBoardState();
+		if (!enemyBoardState.isOccupied(enemyPawnLastPosition)) {
 			return false;
 		}
 		
-		Piece enemyPieceEnd = board.getPiece(enemyEndPos);
-		
-		if (!enemyPieceEnd.getType().isPawn() || enemyPieceEnd.isSameColor(piece)) {
+		if (!enemyBoardState.getPiece(enemyPawnLastPosition).equals(enemyPawn)) {
 			return false;
 		}
 		
 		return true;
 	}
-	
+
+	// TODO: Pawn promotion
 	public boolean isPawnPromotion(Position startPos, Position endPos, Board board) {
 		Piece piece = board.getPiece(startPos);
 		
@@ -319,35 +273,38 @@ public class Game {
 		return true;
 	}
 	
-	public void doCastle(Position startPos, Position endPos, Board board) {
-		Piece king = board.getPiece(startPos);
-		int colDiff = endPos.getCol() - startPos.getCol();
+	private void doCastle(Position startPosition, Position endPosition, Board board) {
+		int colDiff = endPosition.getCol() - startPosition.getCol();
 		int rookCol = (Integer.signum(colDiff) > 0) ? board.getColCount() - 1 : 0;
-		Position rookStartPos = new Position(startPos.getRow(), rookCol);
-		Position rookEndPos = king.getMovePath(startPos, endPos)[0]; // Rook is moved to square King moved through
+		Position rookStartPosition = new Position(startPosition.getRow(), rookCol);
 		
-		board.movePiece(startPos, endPos); // Move King to new square after castle
-		board.movePiece(rookStartPos, rookEndPos); // Move Rook to new square after castle
+		// Rook is moved to square King moved through
+		Piece king = board.getPiece(startPosition);
+		Position rookEndPosition = king.getMovePath(startPosition, endPosition)[0];
+		
+		board.movePiece(startPosition, endPosition); // Move King to new square
+		board.movePiece(rookStartPosition, rookEndPosition); // Move Rook to new square
 	}
 
-	public void doPawnCapture(Position startPos, Position endPos, Board board) {
-		if (isEnPassant(startPos, endPos, board)) {
-			int rowOffset = Integer.signum(endPos.getRow() - startPos.getRow());
-			Position enemyPawnPos = new Position(endPos.getRow() - rowOffset, endPos.getCol());
-			board.removePiece(enemyPawnPos);
+	public void doPawnCapture(Position startPosition, Position endPosition, Board board) {
+		if (isEnPassantCapture(startPosition, endPosition, board)) {
+			int colOffset = Integer.signum(endPosition.getCol() - startPosition.getCol());
+			Position enemyPawnPosition = new Position(startPosition.getRow(), startPosition.getCol() + colOffset);
+			
+			// En passant capture enemy pawn
+			board.removePiece(enemyPawnPosition);
 		}
 		
-		board.removePiece(endPos);
-		board.movePiece(startPos, endPos);
+		// Normal capture
+		board.removePiece(endPosition);
+		board.movePiece(startPosition, endPosition);
 	}
 	
-	public boolean isPositionAttackedByColor(Position endPos, ChessColor color, Board board) {
+	public boolean isPositionAttackedByColor(Position targetPosition, ChessColor color, Board board) {
 		Set<Position> currentPositions = board.getPositionsByColor(color);
 		
-		for (Position startPos : currentPositions) {
-			Piece piece = board.getPiece(startPos);
-			
-			if (board.isMovePathClear(piece.getMovePath(startPos, endPos))) {
+		for (Position currentPosition : currentPositions) {
+			if (isNormalMove(currentPosition, targetPosition, board) || isSpecialMove(currentPosition, targetPosition, board)) {
 				return true;
 			}
 		}
@@ -372,7 +329,7 @@ public class Game {
 		Set<Position> kingEndPositions = getPseudoLegalMoves(kingStartPos);
 		
 		for (Position kingEndPos : kingEndPositions) {
-			if (isLegalMove(kingStartPos, kingEndPos)) {
+			if (isLegalMove(kingStartPos, kingEndPos, chessBoard.getCopy())) {
 				// King can move to safe square; not checkmated
 				return false;
 			}
@@ -443,23 +400,27 @@ public class Game {
 	}
 	
 	private Board getLastBoardState() {
-		return boardHistory.get(boardHistory.size() - 1);
+		if (!hasTurnHistory()) {
+			return null;
+		}
+		
+		return boardHistory.get(boardHistory.size() - 2);
 	}
 	
-	public void undoLastMove() {
-		if (isHistoryEmpty()) {
+	public void undoLastTurn() {
+		if (!hasTurnHistory()) {
 			// TODO: Throw exception
 			return;
 		}
 		
-		int lastIndex = boardHistory.size() - 1;
-		
-		chessBoard = boardHistory.get(lastIndex);
-		boardHistory.remove(lastIndex);
+		chessBoard = getLastBoardState();
+		boardHistory.remove(boardHistory.size() - 1);
+		boardHistory.remove(chessBoard);
+		totalMoves--;
 	}
 	
-	public boolean isHistoryEmpty() {
-		return boardHistory.isEmpty();
+	public boolean hasTurnHistory() {
+		return boardHistory.size() >= 2;
 	}
 	
 	public ChessColor getEnemyColor(ChessColor color) {
@@ -500,7 +461,7 @@ public class Game {
 	 *  P - Pawn
 	 */
 	
-	public void initPieces(ChessColor color) {
+	private void initPieces(ChessColor color) {
 		int kingRow, pawnRow;
 		
 		// Black pieces will be placed on first 2 rows
@@ -528,9 +489,10 @@ public class Game {
 		}
 	}
 	
-	public void initBoard(int rowCount, int colCount) {
+	private void initBoard(int rowCount, int colCount) {
 		chessBoard = new Board(rowCount, colCount);
 		initPieces(ChessColor.WHITE);
 		initPieces(ChessColor.BLACK);
+		saveBoardState();
 	}
 }

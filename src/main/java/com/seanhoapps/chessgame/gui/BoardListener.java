@@ -3,15 +3,12 @@ package com.seanhoapps.chessgame.gui;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-
 public class BoardListener implements MouseListener {
-		
+	private GameGUI gameGUI;
 	private MouseEvent startEvent = null;
-	
-	private BoardPanel boardPanel;
-		
-	public BoardListener(BoardPanel boardPanel) {
-		this.boardPanel = boardPanel;
+			
+	public BoardListener(GameGUI gameGUI) {
+		this.gameGUI = gameGUI;
 	}
 
 	@Override
@@ -25,7 +22,7 @@ public class BoardListener implements MouseListener {
 			return;
 		}
 		
-		boardPanel.onMouseDrag(startEvent, e);
+		gameGUI.onMove(startEvent, e);
 		startEvent = null;
 	}
 	
@@ -37,7 +34,6 @@ public class BoardListener implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// Not used
-		
 	}
 
 	@Override

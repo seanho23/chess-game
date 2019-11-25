@@ -30,70 +30,70 @@ public class KingTest {
 	public void isPossibleMove_moveUp_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 3);
-		assertTrue(king.isPossibleMove(startPos, endPos));
+		assertTrue(king.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDown_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(5, 3);
-		assertTrue(king.isPossibleMove(startPos, endPos));
+		assertTrue(king.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(4, 2);
-		assertTrue(king.isPossibleMove(startPos, endPos));
+		assertTrue(king.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(4, 4);
-		assertTrue(king.isPossibleMove(startPos, endPos));
+		assertTrue(king.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalUpLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 2);
-		assertTrue(king.isPossibleMove(startPos, endPos));
+		assertTrue(king.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalUpRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 4);
-		assertTrue(king.isPossibleMove(startPos, endPos));
+		assertTrue(king.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalDownLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(5, 2);
-		assertTrue(king.isPossibleMove(startPos, endPos));
+		assertTrue(king.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalDownRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(5, 4);
-		assertTrue(king.isPossibleMove(startPos, endPos));
+		assertTrue(king.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveMultipleSquares_returnFalse() {
 		Position startPos = new Position(7, 4);
 		Position endPos = new Position(5, 4);
-		assertFalse(king.isPossibleMove(startPos, endPos));
+		assertFalse(king.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_illegalMove_returnFalse() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(2, 7);
-		assertFalse(king.isPossibleMove(startPos, endPos));
+		assertFalse(king.canMove(startPos, endPos));
 	}
 	
 	/*

@@ -1,9 +1,12 @@
 package com.seanhoapps.chessgame;
 
+import java.awt.Color;
+
 import com.seanhoapps.chessgame.pieces.Piece;
 
 public class Square {
 	private ChessColor color;
+	private Color highlightColor = null;
 	private Piece piece = null;
 	
 	public Square(ChessColor color) {
@@ -12,7 +15,8 @@ public class Square {
 	
 	// Copy constructor
 	public Square(Square square) {
-		this.color = square.getColor();
+		color = square.getColor();
+		highlightColor = square.getHighlightColor();
 	}
 	
 	public ChessColor getColor() {
@@ -33,6 +37,18 @@ public class Square {
 	
 	public boolean isOccupied() {
 		return piece != null;
+	}
+	
+	public Color getHighlightColor() {
+		return highlightColor;
+	}
+	
+	public void setHighlightColor(Color highlightColor) {
+		this.highlightColor = highlightColor;
+	}
+	
+	public boolean isHighlighted() {
+		return highlightColor != null;
 	}
 	
 	public Square getCopy() {

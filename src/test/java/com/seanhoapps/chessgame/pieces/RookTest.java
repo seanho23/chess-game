@@ -30,42 +30,42 @@ public class RookTest {
 	public void isPossibleMove_moveUp_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(0, 3);
-		assertTrue(rook.isPossibleMove(startPos, endPos));
+		assertTrue(rook.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDown_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(6, 3);
-		assertTrue(rook.isPossibleMove(startPos, endPos));
+		assertTrue(rook.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(4, 2);
-		assertTrue(rook.isPossibleMove(startPos, endPos));
+		assertTrue(rook.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(4, 5);
-		assertTrue(rook.isPossibleMove(startPos, endPos));
+		assertTrue(rook.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonal_returnFalse() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(1, 6);
-		assertFalse(rook.isPossibleMove(startPos, endPos));
+		assertFalse(rook.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_illegalMove_returnFalse() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 6);
-		assertFalse(rook.isPossibleMove(startPos, endPos));
+		assertFalse(rook.canMove(startPos, endPos));
 	}
 	
 	/*

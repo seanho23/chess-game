@@ -30,63 +30,63 @@ public class QueenTest {
 	public void isPossibleMove_moveUp_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(0, 3);
-		assertTrue(queen.isPossibleMove(startPos, endPos));
+		assertTrue(queen.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDown_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(6, 3);
-		assertTrue(queen.isPossibleMove(startPos, endPos));
+		assertTrue(queen.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(4, 2);
-		assertTrue(queen.isPossibleMove(startPos, endPos));
+		assertTrue(queen.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(4, 5);
-		assertTrue(queen.isPossibleMove(startPos, endPos));
+		assertTrue(queen.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalUpLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(1, 0);
-		assertTrue(queen.isPossibleMove(startPos, endPos));
+		assertTrue(queen.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalUpRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 4);
-		assertTrue(queen.isPossibleMove(startPos, endPos));
+		assertTrue(queen.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalDownLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(6, 1);
-		assertTrue(queen.isPossibleMove(startPos, endPos));
+		assertTrue(queen.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalDownRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(7, 6);
-		assertTrue(queen.isPossibleMove(startPos, endPos));
+		assertTrue(queen.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_illegalMove_returnFalse() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 6);
-		assertFalse(queen.isPossibleMove(startPos, endPos));
+		assertFalse(queen.canMove(startPos, endPos));
 	}
 	
 	/*

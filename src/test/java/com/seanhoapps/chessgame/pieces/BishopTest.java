@@ -30,42 +30,42 @@ public class BishopTest {
 	public void isPossibleMove_moveDiagonalUpLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(1, 0);
-		assertTrue(bishop.isPossibleMove(startPos, endPos));
+		assertTrue(bishop.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalUpRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 4);
-		assertTrue(bishop.isPossibleMove(startPos, endPos));
+		assertTrue(bishop.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalDownLeft_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(6, 1);
-		assertTrue(bishop.isPossibleMove(startPos, endPos));
+		assertTrue(bishop.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveDiagonalDownRight_returnTrue() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(7, 6);
-		assertTrue(bishop.isPossibleMove(startPos, endPos));
+		assertTrue(bishop.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveUp_returnFalse() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(1, 3);
-		assertFalse(bishop.isPossibleMove(startPos, endPos));
+		assertFalse(bishop.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_illegalMove_returnFalse() {
 		Position startPos = new Position(4, 3);
 		Position endPos = new Position(3, 6);
-		assertFalse(bishop.isPossibleMove(startPos, endPos));
+		assertFalse(bishop.canMove(startPos, endPos));
 	}
 	
 	/*
