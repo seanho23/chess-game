@@ -15,7 +15,7 @@ public class Rook extends Piece {
 	
 	// Rook moves within same row and column
 	@Override
-	public boolean isPossibleMove(Position startPos, Position endPos) {
+	public boolean canMove(Position startPos, Position endPos) {
 		if (startPos.getRow() == endPos.getRow() || startPos.getCol() == endPos.getCol()) {
 			return true;
 		}

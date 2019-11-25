@@ -16,7 +16,7 @@ public class King extends Piece {
 	// King normally moves 1 square within same row, column, and diagonals
 	// Castling conditions are checked by GameController
 	@Override
-	public boolean isPossibleMove(Position startPos, Position endPos) {
+	public boolean canMove(Position startPos, Position endPos) {
 		int rowDiff = Math.abs(endPos.getRow() - startPos.getRow());
 		int colDiff = Math.abs(endPos.getCol() - startPos.getCol());
 		

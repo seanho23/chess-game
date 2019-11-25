@@ -16,24 +16,31 @@ public class Pawn extends Piece {
 	// Pawn normally moves 1 square forward or 2 squares forward if it has not moved before
 	// Capture and en passant conditions are checked by GameController
 	@Override
-	public boolean isPossibleMove(Position startPos, Position endPos) {
+	public boolean canMove(Position startPos, Position endPos) {
 		int startRow = startPos.getRow();
 		int endRow = endPos.getRow();
+		int startCol = startPos.getCol();
+		int endCol = endPos.getCol();
 		
 		// Can only move forward
 		if ((isWhite() && endRow > startRow) || (!isWhite() && endRow < startRow)) {
 			return false;
 		}
 		
-		// Move 1 square forward
+		// Can only move same column
+		if (endCol != startCol) {
+			return false;
+		}
+		
+		// Move 1 square
 		int rowDiff = Math.abs(endRow - startRow);
 		
 		if (rowDiff == 1) {
 			return true;
 		}
 		
-		// Move 2 squares forward
-		if (!hasMoved() && rowDiff == 2) {
+		// Move 2 squares
+		if (!hasMoved && rowDiff == 2) {
 			return true;
 		}
 		

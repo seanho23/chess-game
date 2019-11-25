@@ -32,64 +32,64 @@ public class PawnTest {
 	public void isPossibleMove_moveUpOne_returnTrue() {
 		Position startPos = new Position(6, 3);
 		Position endPos = new Position(5, 3);
-		assertTrue(whitePawn.isPossibleMove(startPos, endPos));
+		assertTrue(whitePawn.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveUpTwoBeforeMoving_returnTrue() {
 		Position startPos = new Position(6, 3);
 		Position endPos = new Position(4, 3);
-		assertTrue(whitePawn.isPossibleMove(startPos, endPos));
+		assertTrue(whitePawn.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveUpTwoAfterMoving_returnFalse() {
 		Position startPos = new Position(6, 3);
 		Position endPos = new Position(4, 3);
-		whitePawn.hasMoved(true);
-		assertFalse(whitePawn.isPossibleMove(startPos, endPos));
+		whitePawn.setMoved();
+		assertFalse(whitePawn.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveUpThree_returnFalse() {
 		Position startPos = new Position(6, 3);
 		Position endPos = new Position(3, 3);
-		assertFalse(whitePawn.isPossibleMove(startPos, endPos));
+		assertFalse(whitePawn.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveLeft_returnFalse() {
 		Position startPos = new Position(6, 3);
 		Position endPos = new Position(6, 2);
-		assertFalse(whitePawn.isPossibleMove(startPos, endPos));
+		assertFalse(whitePawn.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_moveRight_returnFalse() {
 		Position startPos = new Position(6, 3);
 		Position endPos = new Position(6, 4);
-		assertFalse(whitePawn.isPossibleMove(startPos, endPos));
+		assertFalse(whitePawn.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_whiteMoveBackward_returnFalse() {
 		Position startPos = new Position(6, 3);
 		Position endPos = new Position(7, 3);
-		assertFalse(whitePawn.isPossibleMove(startPos, endPos));
+		assertFalse(whitePawn.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_blackMoveBackward_returnFalse() {
 		Position startPos = new Position(1, 4);
 		Position endPos = new Position(0, 4);
-		assertFalse(blackPawn.isPossibleMove(startPos, endPos));
+		assertFalse(blackPawn.canMove(startPos, endPos));
 	}
 	
 	@Test
 	public void isPossibleMove_illegalMove_returnFalse() {
 		Position startPos = new Position(6, 3);
 		Position endPos = new Position(1, 6);
-		assertFalse(whitePawn.isPossibleMove(startPos, endPos));
+		assertFalse(whitePawn.canMove(startPos, endPos));
 	}
 	
 	/*

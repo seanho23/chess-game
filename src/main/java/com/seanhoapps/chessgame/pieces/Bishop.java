@@ -15,7 +15,7 @@ public class Bishop extends Piece {
 	
 	// Bishop moves within same diagonals
 	@Override
-	public boolean isPossibleMove(Position startPos, Position endPos) {
+	public boolean canMove(Position startPos, Position endPos) {
 		int rowDiff = Math.abs(endPos.getRow() - startPos.getRow());
 		int colDiff = Math.abs(endPos.getCol() - startPos.getCol());
 		

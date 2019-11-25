@@ -1,6 +1,6 @@
 package com.seanhoapps.chessgame.pieces;
 
-import javax.swing.ImageIcon;
+import java.awt.Image;
 
 import com.seanhoapps.chessgame.ChessColor;
 import com.seanhoapps.chessgame.Position;
@@ -15,7 +15,7 @@ public abstract class Piece {
 	protected PieceType type;
 	protected ChessColor color;
 	protected boolean hasMoved = false;
-	protected ImageIcon icon;
+	protected Image image;
 	
 	public Piece(PieceType type, ChessColor color) {
 		id = count;
@@ -32,7 +32,7 @@ public abstract class Piece {
 		hasMoved = piece.hasMoved();
 	}
 	
-	public abstract boolean isPossibleMove(Position startPos, Position endPos);
+	public abstract boolean canMove(Position startPos, Position endPos);
 	
 	public abstract Position[] getMovePath(Position startPos, Position endPos);
 	
@@ -62,20 +62,20 @@ public abstract class Piece {
 		return type.toString().charAt(0);
 	}
 	
-	public void hasMoved(boolean hasMoved) {
-		this.hasMoved = hasMoved;
+	public void setMoved() {
+		this.hasMoved = true;
 	}
 	
 	public boolean hasMoved() {
 		return hasMoved;
 	}
 	
-	public ImageIcon getIcon() {
-		return icon;
+	public Image getImage() {
+		return image;
 	}
 	
-	public void setIcon(ImageIcon icon) {
-		this.icon = icon;
+	public void setImage(Image image) {
+		this.image = image;
 	}
 
 	@Override
@@ -106,10 +106,6 @@ public abstract class Piece {
 			return false;
 		}
 		
-		if (hasMoved != piece.hasMoved()) {
-			return false;
-		}
-		
 		return true;
 	}
 	
@@ -119,7 +115,6 @@ public abstract class Piece {
 		hash = 31 * hash + id;
 		hash = 31 * hash + ((type == null) ? 0 : type.hashCode());
 		hash = 31 * hash + ((color == null) ? 0 : color.hashCode());
-		hash = 31 * hash + (hasMoved ? 1231 : 1237);
 		return hash;
 	}
 		

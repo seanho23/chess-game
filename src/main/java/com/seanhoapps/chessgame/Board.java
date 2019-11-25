@@ -48,7 +48,7 @@ public class Board {
 		// Move piece
 		setPiece(endPos, piece);
 		setPiece(startPos, null);
-		piece.hasMoved(true);
+		piece.setMoved();
 		
 		// Store positions for faster access later
 		ChessColor color = piece.getColor();
@@ -65,6 +65,10 @@ public class Board {
 	
   public void removePiece(Position pos) {
 		rangeCheck(pos);
+		
+		if (!isOccupied(pos)) {
+			return;
+		}
 		
 		ChessColor color = getPiece(pos).getColor();
 		
@@ -101,6 +105,12 @@ public class Board {
 		return (color.isWhite()) ? whiteKingPosition : blackKingPosition;
 	}
 	
+	public Piece getPiece(int row, int col) {
+		rangeCheck(row, col);
+		
+		return getSquare(row, col).getPiece();
+	}
+	
 	public Piece getPiece(Position pos) {
 		rangeCheck(pos);
 		
@@ -111,6 +121,12 @@ public class Board {
 		rangeCheck(pos);
 		
 		getSquare(pos).setPiece(piece);
+	}
+	
+	public boolean isOccupied(int row, int col) {
+		rangeCheck(row, col);
+		
+		return getSquare(row, col).isOccupied();
 	}
 	
 	public boolean isOccupied(Position pos) {
@@ -247,5 +263,35 @@ public class Board {
 	
 	private String outOfBoundsMessage(int row, int col) {
 		return "Row: " + row + ", Column: " + col + ", Rows: " + getRowCount() + ", Columns: " + getColCount();
+	}
+	
+	public void printPieces() {
+		for (int row = 0, rows = getRowCount(); row < rows; row++) {
+			String space = "";
+			
+			for (int col = 0, cols = getColCount(); col < cols; col++) {
+				char abbr;
+				
+				if (isOccupied(row, col)) {
+					Piece piece = getPiece(row, col);
+					abbr = piece.getAbbreviation();
+					
+					if (piece.isWhite()) {
+						abbr = Character.toUpperCase(abbr);
+					}
+					else {
+						abbr = Character.toLowerCase(abbr);
+					}
+				}
+				else {
+					abbr = ' ';
+				}
+				
+				System.out.print(space + abbr);
+				space = " ";
+			}
+			
+			System.out.println();
+		}
 	}
 }
