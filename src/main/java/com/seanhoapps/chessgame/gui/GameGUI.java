@@ -130,7 +130,7 @@ public class GameGUI {
 			try {
 				pieceImages.put(filename, ImageIO.read(file));
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println("Unable to read: " + file.getName());
 			}
 		}
 	}

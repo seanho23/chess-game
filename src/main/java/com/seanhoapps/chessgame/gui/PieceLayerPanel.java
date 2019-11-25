@@ -34,7 +34,7 @@ public class PieceLayerPanel extends JPanel {
 				Square square = board.getSquare(row, col);
 				if (square.isOccupied()) {
 					Image image = square.getPiece().getImage();
-					g.drawImage(image, w + (squareWidth - image.getWidth(null)) / 2, h + (squareHeight - image.getHeight(null)) / 2, null);
+					g.drawImage(image, w + ((squareWidth - image.getWidth(null)) / 2), h + ((squareHeight - image.getHeight(null)) / 2), null);
 				}
 			}
 		}
