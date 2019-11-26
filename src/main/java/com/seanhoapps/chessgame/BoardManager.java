@@ -8,7 +8,7 @@ import java.util.Set;
 import com.seanhoapps.chessgame.pieces.Piece;
 import com.seanhoapps.chessgame.pieces.PieceType;
 
-public class Game {
+public class BoardManager {
 	// Constants
 	private static final int ROW_COUNT = 8;
 	private static final int COL_COUNT = 8;
@@ -17,7 +17,7 @@ public class Game {
 	private List<Board> boardHistory = new ArrayList<Board>();
 	private int totalMoves = 0;
 	
-	public Game() {
+	public BoardManager() {
 		initBoard(ROW_COUNT, COL_COUNT);
 	}
 	

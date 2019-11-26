@@ -16,34 +16,34 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
 import com.seanhoapps.chessgame.Board;
+import com.seanhoapps.chessgame.BoardManager;
 import com.seanhoapps.chessgame.ChessColor;
-import com.seanhoapps.chessgame.Game;
 import com.seanhoapps.chessgame.Position;
 import com.seanhoapps.chessgame.pieces.Piece;
 
-public class BoardPanel extends JPanel {
+public class BoardController {
 	// Constants
 	private static final int SQUARE_WIDTH = 100;
 	private static final int SQUARE_HEIGHT = 100;
 	private static final String imageFolder = "/images/pieces";
 	
-	private GameGUI gameGUI;
-	private Game game;
+	private ChessGameGUI gameGUI;
+	private BoardManager boardManager;
 	private Board board;
 	private Map<String, Image> pieceImages = new HashMap<String, Image>();
 	
+	private JPanel boardPanel;
 	private JLayeredPane layers;
 	private JPanel pieceLayer;
 	private JPanel highlightLayer;
 	private JPanel boardLayer;
 	
-	public BoardPanel(GameGUI gameGUI, Game game) {
-		super(new BorderLayout());
+	public BoardController(ChessGameGUI gameGUI, BoardManager boardManager) {
 		this.gameGUI = gameGUI;
-		this.game = game;
-		board = game.getBoard();
+		this.boardManager = boardManager;
+		board = boardManager.getBoard();
 		
-		initPanel();
+		initBoardPanel();
 	}
 	
 	public void onMove(MouseEvent startEvent, MouseEvent endEvent) {
@@ -61,12 +61,12 @@ public class BoardPanel extends JPanel {
 		board.clearAllHighlights();
 		
 		try {
-			game.move(startPosition, endPosition);
+			boardManager.move(startPosition, endPosition);
 			
 			board.setHighlight(startPosition, HighlightType.WARNING);
 			board.setHighlight(endPosition, HighlightType.WARNING);
 			
-			game.saveBoardState();
+			boardManager.saveBoardState();
 		}
 		catch (Exception e) {
 			// Illegal move
@@ -74,26 +74,30 @@ public class BoardPanel extends JPanel {
 			board.setHighlight(endPosition, HighlightType.DANGER);
 		}
 		finally {
-			repaint();
+			boardPanel.repaint();
 		}
 				
 		gameGUI.updateTitle();
 	}
 	
+	public JPanel getGUI() {
+		return boardPanel;
+	}
+	
 	private Position xyToPosition(int x, int y) {
-		int squareWidth = getWidth() / game.getBoard().getRowCount();
-		int squareHeight = getHeight() / game.getBoard().getColCount();
+		int squareWidth = boardPanel.getWidth() / board.getRowCount();
+		int squareHeight = boardPanel.getHeight() / board.getColCount();
 		return new Position(y / squareHeight, x / squareWidth);
 	}
 	
-	private void initPanel() {
+	private void initBoardPanel() {
 		initPieceImages();
 		setPieceImages();
 		
+		boardPanel = new JPanel(new BorderLayout());
 		initBoardLayers();
-		add(layers);
-		
-		addMouseListener(new BoardListener(this));
+		boardPanel.add(layers);
+		boardPanel.addMouseListener(new BoardListener(this));
 	}
 	
 	private void initBoardLayers() {
@@ -103,16 +107,16 @@ public class BoardPanel extends JPanel {
 		layers.setPreferredSize(boardSize);
 		
 		// Bottom layer
-		boardLayer = new BoardLayerPanel(board);
+		boardLayer = new BoardLayer(board);
 		boardLayer.setSize(boardSize);
 		layers.add(boardLayer, JLayeredPane.DEFAULT_LAYER, -1);
 		
-		highlightLayer = new HighlightLayerPanel(board);
+		highlightLayer = new HighlightLayer(board);
 		highlightLayer.setSize(boardSize);
 		layers.add(highlightLayer, JLayeredPane.DEFAULT_LAYER, 0);
 		
 		// Top layer
-		pieceLayer = new PieceLayerPanel(board);
+		pieceLayer = new PieceLayer(board);
 		pieceLayer.setSize(boardSize);
 		layers.add(pieceLayer, JLayeredPane.DRAG_LAYER, 0);
 	}

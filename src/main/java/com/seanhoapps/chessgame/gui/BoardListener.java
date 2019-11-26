@@ -4,10 +4,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class BoardListener implements MouseListener {
-	private BoardPanel boardPanel;
+	private BoardController boardPanel;
 	private MouseEvent startEvent = null;
 			
-	public BoardListener(BoardPanel boardPanel) {
+	public BoardListener(BoardController boardPanel) {
 		this.boardPanel = boardPanel;
 	}
 

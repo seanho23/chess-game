@@ -3,24 +3,25 @@ package com.seanhoapps.chessgame.gui;
 import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-import com.seanhoapps.chessgame.Game;
+import com.seanhoapps.chessgame.BoardManager;
 
-public class GameGUI {
-	private Game game;
+public class ChessGameGUI {
+	private BoardManager boardManager;
 	
 	private JFrame frame;
-	private JPanel boardPanel;
 	
-	public GameGUI(Game game) {
-		this.game = game;
+	// Controllers
+	private BoardController boardController;
+	
+	public ChessGameGUI(BoardManager boardManager) {
+		this.boardManager = boardManager;
 		
 		initGUI();
 	}
 	
 	public void updateTitle() {
-		frame.setTitle("Chess Game (" + game.getTurnColor() + " TURN)");
+		frame.setTitle("Chess Game (" + boardManager.getTurnColor() + " TURN)");
 	}
 	
 	private void initGUI() {		
@@ -34,8 +35,8 @@ public class GameGUI {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		
-		boardPanel = new BoardPanel(this, game);
-		frame.add(boardPanel, BorderLayout.CENTER);
+		boardController = new BoardController(this, boardManager);
+		frame.add(boardController.getGUI(), BorderLayout.CENTER);
 		
 		frame.pack();
 		frame.setLocationRelativeTo(null);
