@@ -4,11 +4,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class BoardListener implements MouseListener {
-	private BoardController boardPanel;
+	private BoardController boardController;
 	private MouseEvent startEvent = null;
 			
-	public BoardListener(BoardController boardPanel) {
-		this.boardPanel = boardPanel;
+	public BoardListener(BoardController boardController) {
+		this.boardController = boardController;
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class BoardListener implements MouseListener {
 			return;
 		}
 		
-		boardPanel.onMove(startEvent, e);
+		boardController.onMove(startEvent, e);
 		startEvent = null;
 	}
 	
