@@ -10,14 +10,14 @@ import com.seanhoapps.chessgame.Board;
 import com.seanhoapps.chessgame.Position;
 import com.seanhoapps.chessgame.Square;
 
-public class HighlightLayerPanel extends JPanel {
+public class HighlightLayer extends JPanel {
 	//Constants
 	private static final Color WARNING_COLOR = new Color(255, 255, 153, 175);
 	private static final Color DANGER_COLOR = new Color(255, 153, 153);
 		
 	private Board board;
 	
-	public HighlightLayerPanel(Board board) {
+	public HighlightLayer(Board board) {
 		this.board = board;
 		
 		initPanel();

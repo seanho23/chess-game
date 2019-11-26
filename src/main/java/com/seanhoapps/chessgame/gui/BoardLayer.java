@@ -8,14 +8,14 @@ import javax.swing.JPanel;
 import com.seanhoapps.chessgame.Board;
 import com.seanhoapps.chessgame.Square;
 
-public class BoardLayerPanel extends JPanel {
+public class BoardLayer extends JPanel {
 	// Constants
 	private static final Color LIGHT_COLOR = new Color(178, 203, 174);
 	private static final Color DARK_COLOR = new Color(106, 146, 101);
 	
 	private Board board;
 	
-	public BoardLayerPanel(Board board) {
+	public BoardLayer(Board board) {
 		this.board = board;
 	}
 	
