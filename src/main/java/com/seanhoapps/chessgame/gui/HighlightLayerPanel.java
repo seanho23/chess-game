@@ -2,16 +2,18 @@ package com.seanhoapps.chessgame.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
 import com.seanhoapps.chessgame.Board;
+import com.seanhoapps.chessgame.Position;
 import com.seanhoapps.chessgame.Square;
 
 public class HighlightLayerPanel extends JPanel {
 	//Constants
-	private static final Color WARNING_HIGHLIGHT_COLOR = new Color(255, 255, 153, 175);
-	private static final Color DANGER_HIGHLIGHT_COLOR = new Color(255, 89, 89);
+	private static final Color WARNING_COLOR = new Color(255, 255, 153, 175);
+	private static final Color DANGER_COLOR = new Color(255, 153, 153);
 		
 	private Board board;
 	
@@ -22,25 +24,25 @@ public class HighlightLayerPanel extends JPanel {
 	}
 	
 	@Override
-	public void paintComponent(Graphics g) {
+	protected void paintComponent(Graphics g) {
+		// Clear highlights
 		super.paintComponent(g);
 		
+		// Paint highlights
 		int rows = board.getRowCount();
 		int cols = board.getColCount();
 		int boardWidth = getWidth();
 		int boardHeight = getHeight();
 		int squareWidth = boardWidth / cols;
 		int squareHeight = boardHeight / rows;
-		for (int row = 0, h = 0; row < rows; row++, h += squareHeight) {
-			for (int col = 0, w = 0; col < cols; col++, w += squareWidth) {
-				Square square = board.getSquare(row, col);
-				if (square.isHighlighted()) {
-					g.setColor(square.getHighlightColor());
-					g.fillRect(w, h, squareWidth, squareHeight);
-					square.setHighlightColor(null);
-				}
-			}
-		}
+		Map<Position, Square> highlightedSquares = board.getHighlightedSquares();
+		highlightedSquares.forEach((position, square) -> {
+			int w = position.getCol() * squareWidth;
+			int h = position.getRow() * squareWidth;
+			Color highlightColor = square.getHighlight().isWarning() ? WARNING_COLOR : DANGER_COLOR;
+			g.setColor(highlightColor);
+			g.fillRect(w, h, squareWidth, squareHeight);
+		});
 	}
 	
 	private void initPanel() {

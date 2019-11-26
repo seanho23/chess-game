@@ -1,12 +1,11 @@
 package com.seanhoapps.chessgame;
 
-import java.awt.Color;
-
+import com.seanhoapps.chessgame.gui.HighlightType;
 import com.seanhoapps.chessgame.pieces.Piece;
 
 public class Square {
 	private ChessColor color;
-	private Color highlightColor = null;
+	private HighlightType highlight;
 	private Piece piece = null;
 	
 	public Square(ChessColor color) {
@@ -16,7 +15,7 @@ public class Square {
 	// Copy constructor
 	public Square(Square square) {
 		color = square.getColor();
-		highlightColor = square.getHighlightColor();
+		highlight = square.getHighlight();
 	}
 	
 	public ChessColor getColor() {
@@ -39,16 +38,16 @@ public class Square {
 		return piece != null;
 	}
 	
-	public Color getHighlightColor() {
-		return highlightColor;
+	public HighlightType getHighlight() {
+		return highlight;
 	}
 	
-	public void setHighlightColor(Color highlightColor) {
-		this.highlightColor = highlightColor;
+	public void setHighlight(HighlightType highlight) {
+		this.highlight = highlight;
 	}
 	
 	public boolean isHighlighted() {
-		return highlightColor != null;
+		return highlight != null;
 	}
 	
 	public Square getCopy() {

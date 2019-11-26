@@ -4,11 +4,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class BoardListener implements MouseListener {
-	private GameGUI gameGUI;
+	private BoardPanel boardPanel;
 	private MouseEvent startEvent = null;
 			
-	public BoardListener(GameGUI gameGUI) {
-		this.gameGUI = gameGUI;
+	public BoardListener(BoardPanel boardPanel) {
+		this.boardPanel = boardPanel;
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class BoardListener implements MouseListener {
 			return;
 		}
 		
-		gameGUI.onMove(startEvent, e);
+		boardPanel.onMove(startEvent, e);
 		startEvent = null;
 	}
 	

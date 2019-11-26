@@ -20,9 +20,11 @@ public class BoardLayerPanel extends JPanel {
 	}
 	
 	@Override
-	public void paintComponent(Graphics g) {
+	protected void paintComponent(Graphics g) {
+		// Clear squares
 		super.paintComponent(g);
 		
+		// Paint squares
 		int rows = board.getRowCount();
 		int cols = board.getColCount();
 		int boardWidth = getWidth();

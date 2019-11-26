@@ -1,12 +1,19 @@
 package com.seanhoapps.chessgame;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import com.seanhoapps.chessgame.gui.HighlightType;
 import com.seanhoapps.chessgame.pieces.Piece;
 
 public class Board {
 	private Square[][] boardSquares;
+	private Map<Position, Square> highlightedSquares = new HashMap<Position, Square>();
+	
 	private Set<Position> whitePositions = new HashSet<Position>();
 	private Set<Position> blackPositions = new HashSet<Position>();
 	private Position whiteKingPosition;
@@ -42,25 +49,23 @@ public class Board {
 	public void movePiece(Position startPos, Position endPos) {
 		rangeCheck(startPos);
 		rangeCheck(endPos);
-		
+				
+		// Move piece to new square
 		Piece piece = getPiece(startPos);
-		
-		// Move piece
 		setPiece(endPos, piece);
-		setPiece(startPos, null);
-		piece.setMoved();
+		piece.setMoved(true);
 		
 		// Store positions for faster access later
 		ChessColor color = piece.getColor();
-		Set<Position> positions = getPositionsByColor(color);
-		
-		positions.remove(startPos);
-		positions.add(endPos);
-		
+		getPositionsByColor(color).add(endPos);
+				
 		// Store King position separately
 		if (piece.getType().isKing()) {
 			setKingPositionByColor(color, endPos);
 		}
+		
+		// Clear old square
+		removePiece(startPos);
 	}
 	
   public void removePiece(Position pos) {
@@ -70,10 +75,16 @@ public class Board {
 			return;
 		}
 		
-		ChessColor color = getPiece(pos).getColor();
-		
+		Piece piece = getPiece(pos);
+		ChessColor color = piece.getColor();
 		setPiece(pos, null);
 		getPositionsByColor(color).remove(pos);
+		
+		// Set King position
+		// This should not happen because game should end before King is captured
+		if (piece.getType().isKing()) {
+			setKingPositionByColor(color, null);
+		}
 	}
 	
 	public boolean isMovePathClear(Position[] movePath) {
@@ -135,6 +146,46 @@ public class Board {
 		return getSquare(pos).isOccupied();
 	}
 	
+	public Map<Position, Square> getHighlightedSquares() {
+		return highlightedSquares;
+	}
+		
+	public HighlightType getHighlight(Position position) {
+		rangeCheck(position);
+		
+		return getSquare(position).getHighlight();
+	}
+	
+	public void setHighlight(Position position, HighlightType highlight) {
+		rangeCheck(position);
+		
+		Square square = getSquare(position);
+		square.setHighlight(highlight);
+		highlightedSquares.put(position, square);
+	}
+	
+	public void clearHighlight(Position position) {
+		rangeCheck(position);
+		
+		getSquare(position).setHighlight(null);
+		highlightedSquares.remove(position);
+	}
+	
+	public void clearAllHighlights() {
+		Iterator<Entry<Position, Square>> iterator = highlightedSquares.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Map.Entry<Position, Square> entry = iterator.next();
+			entry.getValue().setHighlight(null);
+			iterator.remove();
+		}
+	}
+	
+	public boolean isHighlighted(Position position) {
+		rangeCheck(position);
+		
+		return getSquare(position).isHighlighted();
+	}
+	
 	public Square getSquare(int row, int col) {
 		rangeCheck(row, col);
 		
@@ -145,10 +196,6 @@ public class Board {
 		rangeCheck(pos);
 		
 		return boardSquares[pos.getRow()][pos.getCol()];
-	}
-	
-	public Square[][] getSquares() {
-		return boardSquares;
 	}
 	
 	public int getRowCount() {
@@ -200,8 +247,16 @@ public class Board {
 		}
 	}
 	
+	private Square[][] getSquares() {
+		return boardSquares;
+	}
+	
 	private void setSquares(Square[][] squares) {
 		boardSquares = squares;
+	}
+	
+	private void setHighlightedSquares(Map<Position, Square> highlightedSquares) {
+		this.highlightedSquares = highlightedSquares;
 	}
 	
 	private void setSquare(Position pos, Square square) {
@@ -211,17 +266,23 @@ public class Board {
 	}
 	
 	private Square[][] copySquares(Square[][] squares) {
-		int rows = squares.length;
-		int cols = squares[0].length;
+		int rows = getRowCount();
+		int cols = getColCount();
 		Square[][] squaresCopy = new Square[rows][cols];
-		
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
-				squaresCopy[row][col] = squares[row][col].getCopy();
+				squaresCopy[row][col] = squares[row][col].getCopy();;
 			}
 		}
-		
 		return squaresCopy;
+	}
+	
+	private Map<Position, Square> copyHighlightedSquares(Map<Position, Square> highlightedSquares) {
+		Map<Position, Square> highlightedSquaresCopy = new HashMap<Position, Square>();
+		highlightedSquares.forEach((position, square) -> {
+			highlightedSquaresCopy.put(position, square);
+		});
+		return highlightedSquaresCopy;
 	}
 	
 	private Set<Position> copyPositions(Set<Position> positions) {
@@ -237,6 +298,7 @@ public class Board {
 	private void copyBoard(Board board) {
 		// Copy squares
 		setSquares(copySquares(board.getSquares()));
+		setHighlightedSquares(copyHighlightedSquares(board.getHighlightedSquares()));
 		
 		// Copy positions
 		setPositionsByColor(ChessColor.WHITE, copyPositions(board.getPositionsByColor(ChessColor.WHITE)));
@@ -268,29 +330,16 @@ public class Board {
 	public void printPieces() {
 		for (int row = 0, rows = getRowCount(); row < rows; row++) {
 			String space = "";
-			
 			for (int col = 0, cols = getColCount(); col < cols; col++) {
-				char abbr;
-				
+				char abbr = ' ';
 				if (isOccupied(row, col)) {
 					Piece piece = getPiece(row, col);
 					abbr = piece.getAbbreviation();
-					
-					if (piece.isWhite()) {
-						abbr = Character.toUpperCase(abbr);
-					}
-					else {
-						abbr = Character.toLowerCase(abbr);
-					}
+					abbr = piece.isWhite() ? Character.toUpperCase(abbr) : Character.toLowerCase(abbr);
 				}
-				else {
-					abbr = ' ';
-				}
-				
 				System.out.print(space + abbr);
 				space = " ";
 			}
-			
 			System.out.println();
 		}
 	}
