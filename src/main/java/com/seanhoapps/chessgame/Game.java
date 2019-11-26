@@ -68,8 +68,7 @@ public class Game {
 		// Perform move
 		doMove(startPosition, endPosition, chessBoard);
 		
-		saveBoardState();
-						
+		// Allow next player to make move
 		totalMoves++;
 	}
 	
@@ -395,7 +394,7 @@ public class Game {
 		return isPositionAttackedByColor(board.getKingPositionByColor(color), getEnemyColor(color), board);
 	}
 	
-	private void saveBoardState() {
+	public void saveBoardState() {
 		boardHistory.add(chessBoard.getCopy());
 	}
 	

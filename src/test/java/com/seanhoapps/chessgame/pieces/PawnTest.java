@@ -46,7 +46,7 @@ public class PawnTest {
 	public void isPossibleMove_moveUpTwoAfterMoving_returnFalse() {
 		Position startPos = new Position(6, 3);
 		Position endPos = new Position(4, 3);
-		whitePawn.setMoved();
+		whitePawn.setMoved(true);
 		assertFalse(whitePawn.canMove(startPos, endPos));
 	}
 	

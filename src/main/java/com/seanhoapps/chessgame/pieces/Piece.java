@@ -62,8 +62,8 @@ public abstract class Piece {
 		return type.toString().charAt(0);
 	}
 	
-	public void setMoved() {
-		this.hasMoved = true;
+	public void setMoved(Boolean hasMoved) {
+		this.hasMoved = hasMoved;
 	}
 	
 	public boolean hasMoved() {

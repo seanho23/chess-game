@@ -6,13 +6,17 @@ import com.seanhoapps.chessgame.gui.GameGUI;
 
 public class ChessGame {
 	public static void main(String[] args) {
+		Game game = new Game();
+		
 		SwingUtilities.invokeLater(new Runnable() {
-			
 			@Override
 			public void run() {
-				new GameGUI(new Game());
+				createAndShowGUI(game);
 			}
-			
 		});
+	}
+	
+	private static void createAndShowGUI(Game game) {
+		new GameGUI(game);
 	}
 }
