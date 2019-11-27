@@ -152,12 +152,14 @@ public class BoardManager {
 			return false;
 		}
 		
-		// King cannot castle through check		
-		if (isPositionAttackedByColor(king.getMovePath(startPosition, endPosition)[0], enemyColor, board)) {
+		// King cannot castle through check
+		int colOffset = Integer.signum(colDiff);
+		Position adjacentPosition = new Position(startPosition.getRow(), startPosition.getCol() + colOffset);
+		if (isPositionAttackedByColor(adjacentPosition, enemyColor, board)) {
 			return false;
 		}
 		
-		int rookCol = (Integer.signum(colDiff) > 0) ? board.getColCount() - 1 : 0;
+		int rookCol = (colOffset > 0) ? board.getColCount() - 1 : 0;
 		Position rookPosition = new Position(startPosition.getRow(), rookCol);
 		if (!board.isOccupied(rookPosition)) {
 			return false;
@@ -165,7 +167,7 @@ public class BoardManager {
 		
 		// Rook castling conditions
 		Piece rook = board.getPiece(rookPosition);
-		if (!rook.getType().isRook() || rook.hasMoved() || rook.isSameColor(king)) {
+		if (!rook.getType().isRook() || rook.hasMoved() || !rook.isSameColor(king)) {
 			return false;
 		}
 		
@@ -273,13 +275,11 @@ public class BoardManager {
 	}
 	
 	private void doCastle(Position startPosition, Position endPosition, Board board) {
-		int colDiff = endPosition.getCol() - startPosition.getCol();
-		int rookCol = (Integer.signum(colDiff) > 0) ? board.getColCount() - 1 : 0;
+		int colOffset = Integer.signum(endPosition.getCol() - startPosition.getCol());
+		int rookCol = (colOffset > 0) ? board.getColCount() - 1 : 0;
 		Position rookStartPosition = new Position(startPosition.getRow(), rookCol);
-		
 		// Rook is moved to square King moved through
-		Piece king = board.getPiece(startPosition);
-		Position rookEndPosition = king.getMovePath(startPosition, endPosition)[0];
+		Position rookEndPosition = new Position(startPosition.getRow(), startPosition.getCol() + colOffset);
 		
 		board.movePiece(startPosition, endPosition); // Move King to new square
 		board.movePiece(rookStartPosition, rookEndPosition); // Move Rook to new square
@@ -301,13 +301,11 @@ public class BoardManager {
 	
 	public boolean isPositionAttackedByColor(Position targetPosition, ChessColor color, Board board) {
 		Set<Position> currentPositions = board.getPositionsByColor(color);
-		
 		for (Position currentPosition : currentPositions) {
-			if (isNormalMove(currentPosition, targetPosition, board) || isSpecialMove(currentPosition, targetPosition, board)) {
+			if (isNormalMove(currentPosition, targetPosition, board) || isPawnCapture(currentPosition, targetPosition, board)) {
 				return true;
 			}
 		}
-		
 		return false;
 	}
 	
