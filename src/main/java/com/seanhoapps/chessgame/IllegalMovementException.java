@@ -1,19 +1,19 @@
 package com.seanhoapps.chessgame;
 
-public class IllegalMoveException extends Exception {
+public class IllegalMovementException extends Exception {
 	
 	private Position startPosition = null;
 	private Position endPosition = null;
 	
-	public IllegalMoveException() {
+	public IllegalMovementException() {
 		super();
 	}
 	
-	public IllegalMoveException(String message) {
+	public IllegalMovementException(String message) {
 		super(message);
 	}
 	
-	public IllegalMoveException(String message, Position startPosition, Position endPosition) {
+	public IllegalMovementException(String message, Position startPosition, Position endPosition) {
 		super(message + ": " + startPosition + " --> " + endPosition);
 		this.startPosition = startPosition;
 		this.endPosition = endPosition;

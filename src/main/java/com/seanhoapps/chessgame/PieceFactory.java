@@ -10,8 +10,11 @@ import com.seanhoapps.chessgame.pieces.Queen;
 import com.seanhoapps.chessgame.pieces.Rook;
 
 public class PieceFactory {
+
+	private PieceFactory() {}
+	
 	public static Piece createPiece(PieceType type, ChessColor color) {
-		Piece piece = null;
+		Piece piece;
 		
 		switch (type) {
 			case KING:
@@ -33,7 +36,7 @@ public class PieceFactory {
 				piece = new Pawn(color);
 				break;
 			default:
-				throw new IllegalArgumentException("Invalid PieceType"); // This should never happen
+				throw new AssertionError("Invalid PieceType");
 		}
 
 		return piece;
