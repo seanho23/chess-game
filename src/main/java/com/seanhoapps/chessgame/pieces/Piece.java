@@ -3,24 +3,26 @@ package com.seanhoapps.chessgame.pieces;
 import java.awt.Image;
 
 import com.seanhoapps.chessgame.ChessColor;
+import com.seanhoapps.chessgame.PieceImage;
 import com.seanhoapps.chessgame.Position;
 
 public abstract class Piece {
 	// Used to assign unique id for each piece
 	private static int count = 0;
 	
-	// Only used by hashCode() for comparisons
-	protected final int id;
-
+	protected final int id; // Only used by hashCode() for comparisons
 	protected PieceType type;
 	protected ChessColor color;
-	protected boolean hasMoved = false;
 	protected Image image;
+	protected boolean hasMoved = false;
 	
 	public Piece(PieceType type, ChessColor color) {
 		id = count;
 		this.type = type;
 		this.color = color;
+		image = PieceImage.getImage(type, color);
+		
+		// Increment unique id for next piece instantiation
 		count++;
 	}
 	
@@ -29,6 +31,7 @@ public abstract class Piece {
 		id = piece.getId();
 		type = piece.getType();
 		color = piece.getColor();
+		image = piece.getImage();
 		hasMoved = piece.hasMoved();
 	}
 	
@@ -72,10 +75,6 @@ public abstract class Piece {
 	
 	public Image getImage() {
 		return image;
-	}
-	
-	public void setImage(Image image) {
-		this.image = image;
 	}
 
 	@Override

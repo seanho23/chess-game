@@ -3,9 +3,11 @@ package com.seanhoapps.chessgame.gui;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import com.seanhoapps.chessgame.Position;
+
 public class BoardListener implements MouseListener {
 	private BoardController boardController;
-	private MouseEvent startEvent = null;
+	private MouseEvent startMouseEvent = null;
 			
 	public BoardListener(BoardController boardController) {
 		this.boardController = boardController;
@@ -13,22 +15,24 @@ public class BoardListener implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		startEvent = e;
+		startMouseEvent = e;
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (startEvent == null) {
+		if (startMouseEvent == null) {
 			return;
 		}
 		
-		boardController.onMove(startEvent, e);
-		startEvent = null;
+		Position startPosition = boardController.xyToPosition(startMouseEvent.getX(), startMouseEvent.getY());
+		Position endPosition = boardController.xyToPosition(e.getX(), e.getY());
+		boardController.onMove(startPosition, endPosition);
+		startMouseEvent = null;
 	}
 	
 	@Override
 	public void mouseExited(MouseEvent e) {
-		startEvent = null;
+		startMouseEvent = null;
 	}
 	
 	@Override
