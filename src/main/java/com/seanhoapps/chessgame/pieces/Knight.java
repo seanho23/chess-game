@@ -15,7 +15,7 @@ public class Knight extends Piece {
 	
 	// Knight moves in L-shape in any direction
 	@Override
-	public boolean canMove(Position startPos, Position endPos) {
+	public boolean isPossibleMove(Position startPos, Position endPos) {
 		int rowDiff = Math.abs(endPos.getRow() - startPos.getRow());
 		int colDiff = Math.abs(endPos.getCol() - startPos.getCol());
 		
@@ -28,6 +28,10 @@ public class Knight extends Piece {
 	
 	@Override
 	public Position[] getMovePath(Position startPos, Position endPos) {
+		if (!isPossibleMove(startPos, endPos)) {
+			return null;
+		}
+		
 		return new Position[0]; // Knight jumps over other pieces
 	}
 	

@@ -141,7 +141,7 @@ public class GameManager implements Observable {
 	private boolean isNormalMove(Position startPosition, Position endPosition, Board board) {
 		// Must satisfy piece-specific movement strategy
 		Piece pieceToMove = board.getPiece(startPosition);
-		if (!pieceToMove.canMove(startPosition, endPosition)) {
+		if (!pieceToMove.isPossibleMove(startPosition, endPosition)) {
 			return false;
 		}
 		

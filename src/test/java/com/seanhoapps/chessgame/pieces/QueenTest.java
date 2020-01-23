@@ -2,110 +2,133 @@ package com.seanhoapps.chessgame.pieces;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import java.util.List;
+import java.util.Set;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.seanhoapps.chessgame.ChessColor;
+import com.seanhoapps.chessgame.PieceFactory;
 import com.seanhoapps.chessgame.Position;
-import com.seanhoapps.chessgame.pieces.Piece;
-import com.seanhoapps.chessgame.pieces.Queen;
 
 public class QueenTest {
-	private Piece queen;
 	
-	@BeforeEach
-	public void setUp () {
-		queen = new Queen(ChessColor.WHITE);
+	@ParameterizedTest
+	@MethodSource("legalMoveProvider")
+	public void isPossibleMove_anyColorLegalMove_returnTrue(List<Object> arguments) {
+		// Arrange
+		ChessColor color = (ChessColor) arguments.get(0);
+		Position startPosition = (Position) arguments.get(1);
+		Position endPosition = (Position) arguments.get(2);
+		
+		// Act
+		boolean isPossibleMove = CreateTarget(color).isPossibleMove(startPosition, endPosition);
+		
+		// Assert
+		assertTrue(isPossibleMove);
 	}
 	
-	/*
-	 * 
-	 *	Tests for Queen.isPossibleMove(Position startPos, Position endPos)
-	 * 
-	*/
-	
-	@Test
-	public void isPossibleMove_moveUp_returnTrue() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(0, 3);
-		assertTrue(queen.canMove(startPos, endPos));
+	@ParameterizedTest
+	@MethodSource("illegalMoveProvider")
+	public void isPossibleMove_anyColorIllegalMove_returnFalse(List<Object> arguments) {
+		// Arrange
+		ChessColor color = (ChessColor) arguments.get(0);
+		Position startPosition = (Position) arguments.get(1);
+		Position endPosition = (Position) arguments.get(2);
+		
+		// Act
+		boolean isPossibleMove = CreateTarget(color).isPossibleMove(startPosition, endPosition);
+		
+		// Assert
+		assertFalse(isPossibleMove);
 	}
 	
-	@Test
-	public void isPossibleMove_moveDown_returnTrue() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(6, 3);
-		assertTrue(queen.canMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_moveLeft_returnTrue() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(4, 2);
-		assertTrue(queen.canMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_moveRight_returnTrue() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(4, 5);
-		assertTrue(queen.canMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_moveDiagonalUpLeft_returnTrue() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(1, 0);
-		assertTrue(queen.canMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_moveDiagonalUpRight_returnTrue() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(3, 4);
-		assertTrue(queen.canMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_moveDiagonalDownLeft_returnTrue() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(6, 1);
-		assertTrue(queen.canMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_moveDiagonalDownRight_returnTrue() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(7, 6);
-		assertTrue(queen.canMove(startPos, endPos));
-	}
-	
-	@Test
-	public void isPossibleMove_illegalMove_returnFalse() {
-		Position startPos = new Position(4, 3);
-		Position endPos = new Position(3, 6);
-		assertFalse(queen.canMove(startPos, endPos));
-	}
-	
-	/*
-	 * 
-	 *	Tests for Queen.getMovePath(Position startPos, Position endPos)
-	 * 
-	*/
-	
-	@Test
-	public void getMovePath_moveOneSquare_returnEmptyPosArray() {
+	@ParameterizedTest
+	@MethodSource("com.seanhoapps.chessgame.pieces.TestProviders#colorProvider")
+	public void getMovePath_anyColorLegalMoveOneSquare_returnEmptyArray(ChessColor color) {
+		// Arrange
 		Position[] expectedPath = new Position[0];
-		Position[] actualPath = queen.getMovePath(new Position(4, 3), new Position(3, 3));
+		
+		// Act
+		Position[] actualPath = CreateTarget(color).getMovePath(new Position(3, 3), new Position(2, 3));
+		
+		// Assert
 		assertArrayEquals(expectedPath, actualPath);
 	}
 	
-	@Test
-	public void getMovePath_moveMultipleSquares_returnPosArray() {
-		Position[] expectedPath = new Position[] {new Position(4, 4), new Position(4, 5), new Position(4, 6)};
-		Position[] actualPath = queen.getMovePath(new Position(4, 3), new Position(4, 7));
+	@ParameterizedTest
+	@MethodSource("com.seanhoapps.chessgame.pieces.TestProviders#colorProvider")
+	public void getMovePath_anyColorLegalMoveMultipleSquares_returnPositionArray(ChessColor color) {
+		// Arrange
+		Position[] expectedPath = {new Position(4, 3), new Position(5, 3)};
+		
+		// Act
+		Position[] actualPath = CreateTarget(color).getMovePath(new Position(3, 3), new Position(6, 3));
+		
+		// Assert
 		assertArrayEquals(expectedPath, actualPath);
 	}
+	
+	@ParameterizedTest
+	@MethodSource("com.seanhoapps.chessgame.pieces.TestProviders#colorProvider")
+	public void getMovePath_anyColorIllegalMove_returnNull(ChessColor color) {		
+		// Act
+		Position[] path = CreateTarget(color).getMovePath(new Position(3, 3), new Position(5, 4));
+		
+		// Assert
+		assertNull(path);
+	}
+	
+	private static Set<List<Object>> legalMoveProvider() {
+		Position startPosition = new Position(3, 3);
+		ImmutableSet<Position> endPositions = ImmutableSet.of(
+					new Position(3, -5),
+					new Position(-1, 3),
+					new Position(1, 3),
+					new Position(3, 5),
+					new Position(6, 3),
+					new Position(10, 3),
+					new Position(3, 2),
+					new Position(2, 3),
+					new Position(3, 4),
+					new Position(4, 3),
+					new Position(2, 2),
+					new Position(0, 0),
+					new Position(-5, -5),
+					new Position(2, 4),
+					new Position(0, 6),
+					new Position(5, 5),
+					new Position(10, 10),
+					new Position(1, 5),
+					new Position(-1, 7)
+				);
+		return Sets.cartesianProduct(TestProviders.colorProvider(), ImmutableSet.of(startPosition), endPositions);
+	}
+	
+	private static Set<List<Object>> illegalMoveProvider() {
+		Position startPosition = new Position(3, 3);
+		ImmutableSet<Position> endPositions = ImmutableSet.of(
+					new Position(-2, 2),
+					new Position(7, 1),
+					new Position(1, 7),
+					new Position(4, -4),
+					new Position(6, 11),
+					new Position(5, 2),
+					new Position(15, 5),
+					new Position(2, 0),
+					new Position(-10, 4)
+				);
+		return Sets.cartesianProduct(TestProviders.colorProvider(), ImmutableSet.of(startPosition), endPositions);
+	}
+	
+	private static Piece CreateTarget(ChessColor color) {
+		return PieceFactory.createPiece(PieceType.QUEEN, color);
+	}
+	
 }

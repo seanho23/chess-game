@@ -35,7 +35,7 @@ public abstract class Piece {
 		hasMoved = piece.hasMoved();
 	}
 	
-	public abstract boolean canMove(Position startPos, Position endPos);
+	public abstract boolean isPossibleMove(Position startPos, Position endPos);
 	
 	public abstract Position[] getMovePath(Position startPos, Position endPos);
 	
