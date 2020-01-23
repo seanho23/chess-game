@@ -15,7 +15,7 @@ public class Queen extends Piece {
 	
 	// Queen moves within same row, column, and diagonals
 	@Override
-	public boolean canMove(Position startPos, Position endPos) {
+	public boolean isPossibleMove(Position startPos, Position endPos) {
 		int startRow = startPos.getRow();
 		int startCol = startPos.getCol();
 		int endRow = endPos.getRow();
@@ -39,6 +39,10 @@ public class Queen extends Piece {
 
 	@Override
 	public Position[] getMovePath(Position startPos, Position endPos) {
+		if (!isPossibleMove(startPos, endPos)) {
+			return null;
+		}
+		
 		int startRow = startPos.getRow();
 		int startCol = startPos.getCol();
 		int endRow = endPos.getRow();
